@@ -1,0 +1,33 @@
+# Environments
+.env
+.env.local
+.env.*.local
+
+# Docker Data
+mysql_data_docker/
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/.venv/
+
+# Python
+**/__pycache__/
+*.py[cod]
+*$py.class
+backend/.venv/
+
+# Vite/React Build
+dist/
+dist-ssr/
+*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
