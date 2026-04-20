@@ -7,10 +7,19 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  const fetchUser = () => {
     getMe()
       .then((data) => setUser(data))
       .catch((err) => console.error("Failed to load user info", err));
+  };
+
+  useEffect(() => {
+    fetchUser();
+
+    window.addEventListener('profileUpdated', fetchUser);
+    return () => {
+      window.removeEventListener('profileUpdated', fetchUser);
+    };
   }, []);
 
   function toggleDropdown() {
@@ -20,6 +29,15 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
+
+  const getProfileImageUrl = () => {
+    if (user?.profile_picture) {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      return `${baseUrl}${user.profile_picture}`;
+    }
+    return "/images/defaultfoto.png";
+  };
+
   return (
     <div className="relative">
       <button
@@ -27,16 +45,19 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+          <img
+            src={getProfileImageUrl()}
+            alt="User"
+            className="w-full h-full object-cover"
+          />
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">
-          {user?.name ? user.name.split(" ")[0] : "Loading..."}
+          {user?.name || "Loading..."}
         </span>
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -90,10 +111,11 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Edit profile
+              Edit profil
             </DropdownItem>
           </li>
-          <li>
+          {/* Yang Saya comment jangan hapus */}
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -117,7 +139,8 @@ export default function UserDropdown() {
               </svg>
               Account settings
             </DropdownItem>
-          </li>
+          </li> */}
+          {/* Yang Di Saya comment jangan hapus */}
           <li>
             <DropdownItem
               onItemClick={closeDropdown}

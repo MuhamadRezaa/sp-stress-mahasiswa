@@ -6,7 +6,14 @@ import UserProfiles from "./pages/UserProfiles";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import StudentDashboard from "./pages/Dashboard/StudentDashboard";
+import PADashboard from "./pages/Dashboard/PADashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminAssignPA from "./pages/admin/AdminAssignPA";
+import AdminData from "./pages/admin/AdminData";
+import AdminDataDetail from "./pages/admin/AdminDataDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleRedirect from "./components/RoleRedirect";
 import DataInputWizard from "./pages/student/DataInputWizard";
 import History from "./pages/student/History";
 import HistoryDetail from "./pages/student/HistoryDetail";
@@ -17,7 +24,7 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Dashboard Layout - Protected */}
+          {/* Layout utama — semua halaman yang butuh sidebar/header */}
           <Route
             element={
               <ProtectedRoute>
@@ -25,25 +32,75 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index path="/" element={<StudentDashboard />} />
+            {/* Home: redirect sesuai role */}
+            <Route index path="/" element={<RoleRedirect />} />
 
-            {/* Profile */}
+            {/* Profile (semua role) */}
             <Route path="/profile" element={<UserProfiles />} />
 
-            {/* Student Pages */}
-            <Route path="/student/input" element={<DataInputWizard />} />
-            <Route path="/student/history" element={<History />} />
-            <Route path="/student/history/:date" element={<HistoryDetail />} />
+            {/* ── Student ── */}
+            <Route path="/student" element={
+              <ProtectedRoute requiredRole="student">
+                <StudentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/input" element={
+              <ProtectedRoute requiredRole="student">
+                <DataInputWizard />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/history" element={
+              <ProtectedRoute requiredRole="student">
+                <History />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/history/:date" element={
+              <ProtectedRoute requiredRole="student">
+                <HistoryDetail />
+              </ProtectedRoute>
+            } />
+
+            {/* ── Dosen PA ── */}
+            <Route path="/pa" element={
+              <ProtectedRoute requiredRole="pa">
+                <PADashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* ── Admin ── */}
+            <Route path="/admin" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/assign-pa" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminAssignPA />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/data" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminData />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/data/:studentId/:date" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDataDetail />
+              </ProtectedRoute>
+            } />
           </Route>
 
-          {/* Auth Layout */}
+          {/* Auth */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-
-          {/* Redirect /login to /signin */}
           <Route path="/login" element={<Navigate to="/signin" replace />} />
 
-          {/* Fallback Route */}
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

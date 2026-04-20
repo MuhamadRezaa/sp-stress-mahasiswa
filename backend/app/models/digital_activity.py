@@ -8,11 +8,12 @@ class DigitalActivity(db.Model):
 
     activity_date = db.Column(db.Date, nullable=False)
 
-    smartphone_duration_hours = db.Column(db.Float, nullable=False)
-    social_media_access_count = db.Column(db.Integer, nullable=False)
-    social_media_duration_hours = db.Column(db.Float, nullable=False)
-    course_count = db.Column(db.Integer, nullable=False)
-    task_count = db.Column(db.Integer, nullable=False)
+    day_type = db.Column(db.String(50), nullable=False, default="perkuliahan")
+    smartphone_duration_hours = db.Column(db.String(50), nullable=False)
+    social_media_access_count = db.Column(db.String(50), nullable=False)
+    social_media_duration_hours = db.Column(db.String(50), nullable=False)
+    course_count = db.Column(db.String(50), nullable=False)
+    task_count = db.Column(db.String(50), nullable=False)
 
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     updated_at = db.Column(

@@ -1,0 +1,29 @@
+# Production override — jalankan dengan:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+  backend:
+    command: >
+      gunicorn
+      --workers 4
+      --bind 0.0.0.0:5000
+      --timeout 120
+      --access-logfile -
+      --error-logfile -
+      "run:app"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    volumes: []
+
+  frontend:
+    build:
+      context: ./frontend
+      target: prod  # Gunakan stage prod (Nginx)
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+        - VITE_APP_NAME=${VITE_APP_NAME}
+    ports:
+      - "80:80"   # Production: port 80 (HTTP)
+    volumes: []   # Tidak perlu hot-reload di production
+    environment: []

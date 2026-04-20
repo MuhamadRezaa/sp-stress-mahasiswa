@@ -6,7 +6,7 @@ from app.models.user import User
 def main():
     app = create_app()
     with app.app_context():
-        email = "student@example.com"
+        email = "student2@example.com"
         password = "student12345"
 
         existing = User.query.filter_by(email=email).first()
@@ -28,7 +28,7 @@ def main():
         )
         db.session.add(student)
         db.session.commit()
-        print("Admin created:")
+        print("Student created:")
         print("  email:", email)
         print("  password:", password)
 

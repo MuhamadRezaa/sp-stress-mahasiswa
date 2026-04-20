@@ -34,6 +34,7 @@ type Step = "date" | "digital" | "physio" | "pss10" | "result";
 
 interface FormData {
   activity_date: string;
+  day_type: string;
   // Digital
   smartphone_duration_hours: string;
   social_media_access_count: string;
@@ -80,6 +81,7 @@ export default function DataInputWizard() {
 
   const [formData, setFormData] = useState<FormData>({
     activity_date: "",
+    day_type: "perkuliahan",
     smartphone_duration_hours: "",
     social_media_access_count: "",
     social_media_duration_hours: "",
@@ -93,7 +95,7 @@ export default function DataInputWizard() {
     pss_answers: Array(10).fill(-1),
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -133,7 +135,7 @@ export default function DataInputWizard() {
 
   const validateDigital = () => {
     if (!formData.smartphone_duration_hours || !formData.social_media_access_count ||
-        !formData.social_media_duration_hours || !formData.course_count || !formData.task_count) {
+      !formData.social_media_duration_hours || !formData.course_count || !formData.task_count) {
       setError("Semua field wajib diisi");
       return false;
     }
@@ -142,7 +144,7 @@ export default function DataInputWizard() {
 
   const validatePhysio = () => {
     if (!formData.heart_rate_avg || !formData.heart_rate_min || !formData.heart_rate_max ||
-        !formData.step_count || !formData.sleep_duration_hours) {
+      !formData.step_count || !formData.sleep_duration_hours) {
       setError("Semua field wajib diisi");
       return false;
     }
@@ -159,7 +161,7 @@ export default function DataInputWizard() {
 
   const handleNext = () => {
     setError("");
-    
+
     if (currentStep === "date" && validateDate()) {
       setCurrentStep("digital");
     } else if (currentStep === "digital" && validateDigital()) {
@@ -186,11 +188,12 @@ export default function DataInputWizard() {
       // Submit Digital Activity
       await http.post("/student/digital", {
         activity_date: formData.activity_date,
-        smartphone_duration_hours: parseFloat(formData.smartphone_duration_hours),
-        social_media_access_count: parseInt(formData.social_media_access_count),
-        social_media_duration_hours: parseFloat(formData.social_media_duration_hours),
-        course_count: parseInt(formData.course_count),
-        task_count: parseInt(formData.task_count),
+        day_type: formData.day_type,
+        smartphone_duration_hours: formData.smartphone_duration_hours,
+        social_media_access_count: formData.social_media_access_count,
+        social_media_duration_hours: formData.social_media_duration_hours,
+        course_count: formData.course_count,
+        task_count: formData.task_count,
       });
 
       // Submit Physiological Data
@@ -271,8 +274,8 @@ export default function DataInputWizard() {
   return (
     <>
       <PageMeta
-        title="Input Data Harian | Stress Prediction System"
-        description="Form input data harian untuk prediksi stress"
+        title="Input Data Harian"
+        description="Form input data harian"
       />
 
       <div className="w-full">
@@ -281,17 +284,15 @@ export default function DataInputWizard() {
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.key} className="flex items-center">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                  index <= getStepNumber()
-                    ? "bg-brand-500 text-white"
-                    : "bg-gray-200 text-gray-500 dark:bg-gray-700"
-                }`}>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${index <= getStepNumber()
+                  ? "bg-brand-500 text-white"
+                  : "bg-gray-200 text-gray-500 dark:bg-gray-700"
+                  }`}>
                   {index < getStepNumber() ? "✓" : index + 1}
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`hidden sm:block w-12 lg:w-20 h-1 mx-2 ${
-                    index < getStepNumber() ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
-                  }`} />
+                  <div className={`hidden sm:block w-12 lg:w-20 h-1 mx-2 ${index < getStepNumber() ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
+                    }`} />
                 )}
               </div>
             ))}
@@ -342,6 +343,36 @@ export default function DataInputWizard() {
                   }}
                   disabled={[{ after: new Date() }, ...completedDates]} // Tidak bisa pilih masa depan dan yang sudah diisi
                 />
+
+                {formData.activity_date && (
+                  <div className="mt-8 w-full">
+                    <Label>Jenis Hari</Label>
+                    <div className="flex gap-4 mt-2">
+                      <label className="flex items-center gap-2 cursor-pointer p-3 border rounded-xl flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-gray-200 dark:border-gray-700">
+                        <input
+                          type="radio"
+                          name="day_type"
+                          value="perkuliahan"
+                          checked={formData.day_type === "perkuliahan"}
+                          onChange={(e) => setFormData(prev => ({ ...prev, day_type: e.target.value }))}
+                          className="w-4 h-4 text-brand-500 bg-gray-100 border-gray-300 focus:ring-brand-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Kuliah Biasa</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer p-3 border rounded-xl flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-gray-200 dark:border-gray-700">
+                        <input
+                          type="radio"
+                          name="day_type"
+                          value="ujian"
+                          checked={formData.day_type === "ujian"}
+                          onChange={(e) => setFormData(prev => ({ ...prev, day_type: e.target.value }))}
+                          className="w-4 h-4 text-brand-500 bg-gray-100 border-gray-300 focus:ring-brand-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Minggu Ujian</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -359,66 +390,85 @@ export default function DataInputWizard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="smartphone_duration_hours">Durasi Smartphone (jam)</Label>
-                  <Input
-                    type="number"
+                  <Label htmlFor="smartphone_duration_hours">Screen Time (Durasi Smartphone)</Label>
+                  <select
                     id="smartphone_duration_hours"
                     name="smartphone_duration_hours"
-                    placeholder="0"
-                    step={0.5}
-                    min="0"
                     value={formData.smartphone_duration_hours}
                     onChange={handleChange}
-                  />
+                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:focus:border-brand-500"
+                  >
+                    <option value="" disabled>Pilih durasi...</option>
+                    <option value="<2 jam">&lt;2 jam</option>
+                    <option value="2–4 jam">2–4 jam</option>
+                    <option value="4–6 jam">4–6 jam</option>
+                    <option value=">6 jam">&gt;6 jam</option>
+                  </select>
                 </div>
                 <div>
-                  <Label htmlFor="social_media_access_count">Akses Media Sosial (kali)</Label>
-                  <Input
-                    type="number"
+                  <Label htmlFor="social_media_access_count">Frekuensi Media Sosial</Label>
+                  <select
                     id="social_media_access_count"
                     name="social_media_access_count"
-                    placeholder="0"
-                    min="0"
                     value={formData.social_media_access_count}
                     onChange={handleChange}
-                  />
+                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:focus:border-brand-500"
+                  >
+                    <option value="" disabled>Pilih frekuensi...</option>
+                    <option value="Tidak pernah (0 kali)">Tidak pernah (0 kali)</option>
+                    <option value="Jarang (1–3 kali)">Jarang (1–3 kali)</option>
+                    <option value="Kadang-kadang (4–10 kali)">Kadang-kadang (4–10 kali)</option>
+                    <option value="Sering (11–20 kali)">Sering (11–20 kali)</option>
+                    <option value="Sangat sering (≥21 kali)">Sangat sering (&ge;21 kali)</option>
+                  </select>
                 </div>
                 <div>
-                  <Label htmlFor="social_media_duration_hours">Durasi Media Sosial (jam)</Label>
-                  <Input
-                    type="number"
+                  <Label htmlFor="social_media_duration_hours">Durasi Media Sosial</Label>
+                  <select
                     id="social_media_duration_hours"
                     name="social_media_duration_hours"
-                    placeholder="0"
-                    step={0.5}
-                    min="0"
                     value={formData.social_media_duration_hours}
                     onChange={handleChange}
-                  />
+                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:focus:border-brand-500"
+                  >
+                    <option value="" disabled>Pilih durasi...</option>
+                    <option value="Tidak ada">Tidak ada</option>
+                    <option value="<1 jam">&lt;1 jam</option>
+                    <option value="1–3 jam">1–3 jam</option>
+                    <option value=">3 jam">&gt;3 jam</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="course_count">Jumlah Mata Kuliah</Label>
-                  <Input
-                    type="number"
+                  <select
                     id="course_count"
                     name="course_count"
-                    placeholder="0"
-                    min="0"
                     value={formData.course_count}
                     onChange={handleChange}
-                  />
+                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:focus:border-brand-500"
+                  >
+                    <option value="" disabled>Pilih jumlah...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="≥4">&ge;4</option>
+                  </select>
                 </div>
                 <div>
-                  <Label htmlFor="task_count">Jumlah Tugas</Label>
-                  <Input
-                    type="number"
+                  <Label htmlFor="task_count">Jumlah Tugas Kuliah</Label>
+                  <select
                     id="task_count"
                     name="task_count"
-                    placeholder="0"
-                    min="0"
                     value={formData.task_count}
                     onChange={handleChange}
-                  />
+                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:focus:border-brand-500"
+                  >
+                    <option value="" disabled>Pilih jumlah...</option>
+                    <option value="Tidak ada">Tidak ada</option>
+                    <option value="1–2">1–2</option>
+                    <option value="3–4">3–4</option>
+                    <option value="≥4">&ge;4</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -522,11 +572,10 @@ export default function DataInputWizard() {
                       {PSS_OPTIONS.map((option) => (
                         <label
                           key={option.value}
-                          className={`cursor-pointer px-3 py-2 rounded-lg text-xs sm:text-sm transition ${
-                            formData.pss_answers[index] === option.value
-                              ? "bg-brand-500 text-white"
-                              : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300"
-                          }`}
+                          className={`cursor-pointer px-3 py-2 rounded-lg text-xs sm:text-sm transition ${formData.pss_answers[index] === option.value
+                            ? "bg-brand-500 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300"
+                            }`}
                         >
                           <input
                             type="radio"

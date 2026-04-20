@@ -16,12 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Expose the Flask port
 EXPOSE 5000
 
-# Run the application in development mode
 ENV FLASK_APP=run.py
-ENV FLASK_ENV=development
-ENV FLASK_DEBUG=1
 
+# Default: development mode (overridden by docker-compose.prod.yml)
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

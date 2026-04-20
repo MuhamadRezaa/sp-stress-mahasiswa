@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {EyeCloseIcon, EyeIcon } from "../../icons";
+import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
@@ -23,7 +23,7 @@ export default function SignInForm() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, isChecked);
       navigate("/");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
@@ -43,10 +43,10 @@ export default function SignInForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+              Masuk
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
+              Masukkan email dan password Anda untuk masuk!
             </p>
           </div>
           <div>
@@ -76,7 +76,7 @@ export default function SignInForm() {
                     fill="#EB4335"
                   />
                 </svg>
-                Sign in with Google
+                Masuk dengan Google
               </button>
             </div>
             <div className="relative py-3 sm:py-5">
@@ -85,7 +85,7 @@ export default function SignInForm() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
-                  Or
+                  Atau
                 </span>
               </div>
             </div>
@@ -100,9 +100,9 @@ export default function SignInForm() {
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input 
-                    placeholder="info@gmail.com" 
-                    value={email} 
+                  <Input
+                    placeholder="info@gmail.com"
+                    value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
                   />
@@ -114,7 +114,7 @@ export default function SignInForm() {
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password" value={password}
+                      placeholder="Masukkan password" value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
                     />
@@ -134,19 +134,19 @@ export default function SignInForm() {
                   <div className="flex items-center gap-3">
                     <Checkbox checked={isChecked} onChange={setIsChecked} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
-                      Keep me logged in
+                      Tetap masuk
                     </span>
                   </div>
                   <Link
                     to="/reset-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
-                    Forgot password?
+                    Lupa password?
                   </Link>
                 </div>
                 <div>
                   <Button type="submit" className="w-full" size="sm" disabled={isLoading}>
-                    {isLoading ? "Signing in..." : "Sign in"}
+                    {isLoading ? "Masuk..." : "Masuk"}
                   </Button>
                 </div>
               </div>
@@ -154,12 +154,12 @@ export default function SignInForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account? {""}
+                Belum punya akun? {""}
                 <Link
                   to="/signup"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
-                  Sign Up
+                  Daftar
                 </Link>
               </p>
             </div>

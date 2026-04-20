@@ -21,6 +21,7 @@ def upsert_digital_activity():
 
     required = [
         "activity_date",
+        "day_type",
         "smartphone_duration_hours",
         "social_media_access_count",
         "social_media_duration_hours",
@@ -40,11 +41,12 @@ def upsert_digital_activity():
         ).date()
 
         payload = {
-            "smartphone_duration_hours": float(data["smartphone_duration_hours"]),
-            "social_media_access_count": int(data["social_media_access_count"]),
-            "social_media_duration_hours": float(data["social_media_duration_hours"]),
-            "course_count": int(data["course_count"]),
-            "task_count": int(data["task_count"]),
+            "day_type": str(data["day_type"]),
+            "smartphone_duration_hours": str(data["smartphone_duration_hours"]),
+            "social_media_access_count": str(data["social_media_access_count"]),
+            "social_media_duration_hours": str(data["social_media_duration_hours"]),
+            "course_count": str(data["course_count"]),
+            "task_count": str(data["task_count"]),
         }
     except Exception:
         return jsonify({
@@ -96,6 +98,7 @@ def digital_activity_history():
         "data": [
             {
                 "activity_date": r.activity_date.isoformat(),
+                "day_type": r.day_type,
                 "smartphone_duration_hours": r.smartphone_duration_hours,
                 "social_media_access_count": r.social_media_access_count,
                 "social_media_duration_hours": r.social_media_duration_hours,

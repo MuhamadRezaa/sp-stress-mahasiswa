@@ -18,7 +18,7 @@ export default function HistoryDetail() {
     if (item && item.date === date) {
       return;
     }
-    
+
     // Fetch if state is missing
     const fetchData = async () => {
       try {
@@ -49,9 +49,9 @@ export default function HistoryDetail() {
         }
 
         if (!targetItem.digital && !targetItem.physio && !targetItem.pss10) {
-           setError("Data tidak ditemukan untuk tanggal ini.");
+          setError("Data tidak ditemukan untuk tanggal ini.");
         } else {
-           setItem(targetItem);
+          setItem(targetItem);
         }
       } catch {
         setError("Gagal memuat data detail.");
@@ -62,6 +62,14 @@ export default function HistoryDetail() {
 
     fetchData();
   }, [date, item]);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const dateObj = new Date(dateString);
+    const dayName = new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(dateObj);
+    const [year, month, day] = dateString.split("-");
+    return `${dayName}, ${day}-${month}-${year}`;
+  };
 
   if (isLoading) {
     return (
@@ -87,8 +95,8 @@ export default function HistoryDetail() {
   return (
     <>
       <PageMeta
-        title={`Detail Riwayat - ${date} | Stress Prediction System`}
-        description="Detail data riwayat pada tanggal spesifik"
+        title={`Detail Riwayat - ${date ? formatDate(date) : ""}`}
+        description="Detail riwayat data"
       />
 
       <div className="space-y-4">
@@ -106,7 +114,18 @@ export default function HistoryDetail() {
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               Detail Riwayat Data
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Tanggal: {item.date}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Tanggal: {item.date ? formatDate(item.date) : ""}</p>
+              {item.digital?.day_type === "ujian" ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                  Minggu Ujian
+                </span>
+              ) : item.digital?.day_type === "perkuliahan" ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                  Kuliah Biasa
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -121,22 +140,22 @@ export default function HistoryDetail() {
               <div className="space-y-3">
                 <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
                   <span className="text-gray-500 dark:text-gray-400">Durasi Smartphone</span>
-                  <span className="font-medium text-gray-800 dark:text-white">{item.digital.smartphone_duration_hours} jam</span>
+                  <span className="font-medium text-gray-800 dark:text-white text-right">{item.digital.smartphone_duration_hours}</span>
                 </p>
                 <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
                   <span className="text-gray-500 dark:text-gray-400">Akses Medsos</span>
-                  <span className="font-medium text-gray-800 dark:text-white">{item.digital.social_media_access_count}x</span>
+                  <span className="font-medium text-gray-800 dark:text-white text-right">{item.digital.social_media_access_count}</span>
                 </p>
                 <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
                   <span className="text-gray-500 dark:text-gray-400">Durasi Medsos</span>
-                  <span className="font-medium text-gray-800 dark:text-white">{item.digital.social_media_duration_hours} jam</span>
+                  <span className="font-medium text-gray-800 dark:text-white text-right">{item.digital.social_media_duration_hours}</span>
                 </p>
                 <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
                   <span className="text-gray-500 dark:text-gray-400">Mata Kuliah</span>
                   <span className="font-medium text-gray-800 dark:text-white">{item.digital.course_count}</span>
                 </p>
                 <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500 dark:text-gray-400">Tugas</span>
+                  <span className="text-gray-500 dark:text-gray-400">Tugas Kuliah</span>
                   <span className="font-medium text-gray-800 dark:text-white">{item.digital.task_count}</span>
                 </p>
               </div>
@@ -202,8 +221,10 @@ export default function HistoryDetail() {
                   </p>
                   {item.stress_level && (
                     <p className="flex justify-between items-center mt-2">
-                       <span className="text-gray-500 dark:text-gray-400">Level Stres</span>
-                       <span className="font-medium capitalize text-gray-800 dark:text-white">{item.stress_level}</span>
+                      <span className="text-gray-500 dark:text-gray-400">Level Stres</span>
+                      <span className="font-medium capitalize text-gray-800 dark:text-white">
+                        {item.stress_level === "low" ? "Rendah" : item.stress_level === "medium" ? "Sedang" : item.stress_level === "high" ? "Tinggi" : item.stress_level}
+                      </span>
                     </p>
                   )}
                 </div>

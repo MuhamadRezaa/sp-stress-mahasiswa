@@ -5,6 +5,21 @@ import { getMe, getToken, User } from "../api/auth";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
+  requireCompleteProfile?: boolean;
+}
+
+// Routes that student can access even without a complete profile
+const PROFILE_EXEMPT_PATHS = ["/profile"];
+
+function isStudentProfileComplete(user: User): boolean {
+  return !!(
+    user.gender &&
+    user.age &&
+    user.university &&
+    user.major &&
+    user.semester &&
+    user.residential_status
+  );
 }
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
@@ -28,6 +43,7 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
         setIsAuthenticated(true);
       } catch {
         localStorage.removeItem("access_token");
+        sessionStorage.removeItem("access_token");
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -51,6 +67,18 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
 
   if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/" replace />;
+  }
+
+  // Profile completion gate: only for students on non-exempt pages
+  const isExemptPath = PROFILE_EXEMPT_PATHS.some((p) => location.pathname.startsWith(p));
+  if (user?.role === "student" && !isExemptPath && !isStudentProfileComplete(user)) {
+    return (
+      <Navigate
+        to="/profile"
+        state={{ requiresProfileCompletion: true }}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

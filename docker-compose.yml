@@ -1,28 +1,32 @@
 services:
   db:
     image: mysql:8.0
-    container_name: stress_db_container_docker
+    container_name: spsm_db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Jakarta
     ports:
       - "3307:3306"
     volumes:
       - mysql_data_docker:/var/lib/mysql
 
   backend:
-    build: ./backend
-    container_name: stress_backend_container_docker
+    build:
+      context: ./backend
+    container_name: spsm_backend
     restart: always
     environment:
-      - FLASK_ENV=${FLASK_ENV}
-      - FLASK_DEBUG=${FLASK_DEBUG}
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-1}
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      - TZ=Asia/Jakarta
     ports:
       - "5000:5000"
     depends_on:
@@ -33,19 +37,23 @@ services:
   frontend:
     build:
       context: ./frontend
+      target: dev
       args:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-    container_name: stress_frontend_container_docker
+        - VITE_APP_NAME=${VITE_APP_NAME}
+    container_name: spsm_frontend
     restart: always
     environment:
       - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_APP_NAME=${VITE_APP_NAME}
     ports:
       - "5173:5173"
     depends_on:
       - backend
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
 
 volumes:
   mysql_data_docker:
+  frontend_node_modules:
