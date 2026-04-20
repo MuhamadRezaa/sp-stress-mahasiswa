@@ -1,8 +1,8 @@
 """create digital activities table
 
-Revision ID: 4514d29a9086
-Revises: 7ae303493c12
-Create Date: 2026-01-25 23:56:34.876589
+Revision ID: 382943a3e056
+Revises: 1a11cac79ab6
+Create Date: 2026-04-21 02:57:59.929384
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4514d29a9086'
-down_revision = '7ae303493c12'
+revision = '382943a3e056'
+down_revision = '1a11cac79ab6'
 branch_labels = None
 depends_on = None
 
@@ -22,11 +22,12 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('activity_date', sa.Date(), nullable=False),
-    sa.Column('smartphone_duration_hours', sa.Float(), nullable=False),
-    sa.Column('social_media_access_count', sa.Integer(), nullable=False),
-    sa.Column('social_media_duration_hours', sa.Float(), nullable=False),
-    sa.Column('course_count', sa.Integer(), nullable=False),
-    sa.Column('task_count', sa.Integer(), nullable=False),
+    sa.Column('day_type', sa.String(length=50), nullable=False),
+    sa.Column('smartphone_duration_hours', sa.String(length=50), nullable=False),
+    sa.Column('social_media_access_count', sa.String(length=50), nullable=False),
+    sa.Column('social_media_duration_hours', sa.String(length=50), nullable=False),
+    sa.Column('course_count', sa.String(length=50), nullable=False),
+    sa.Column('task_count', sa.String(length=50), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),

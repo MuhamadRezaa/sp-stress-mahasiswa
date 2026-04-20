@@ -1,8 +1,8 @@
 """create users table
 
-Revision ID: 7ae303493c12
+Revision ID: 1a11cac79ab6
 Revises: 
-Create Date: 2026-01-25 16:25:17.416630
+Create Date: 2026-04-21 02:53:01.355446
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7ae303493c12'
+revision = '1a11cac79ab6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,12 +24,21 @@ def upgrade():
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
     sa.Column('role', sa.Enum('student', 'pa', 'admin', name='user_role'), nullable=False),
+    sa.Column('pa_id', sa.Integer(), nullable=True),
+    sa.Column('gender', sa.Enum('L', 'P', name='gender_enum'), nullable=True),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('university', sa.String(length=255), nullable=True),
+    sa.Column('major', sa.String(length=255), nullable=True),
+    sa.Column('semester', sa.Integer(), nullable=True),
+    sa.Column('residential_status', sa.String(length=100), nullable=True),
+    sa.Column('phone', sa.String(length=20), nullable=True),
+    sa.Column('profile_picture', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['pa_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_users_email'), ['email'], unique=True)
-
     # ### end Alembic commands ###
 
 

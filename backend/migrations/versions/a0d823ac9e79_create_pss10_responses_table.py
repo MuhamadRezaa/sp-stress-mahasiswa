@@ -1,8 +1,8 @@
 """create pss10 responses table
 
-Revision ID: 041c26078309
-Revises: 67433725ab6a
-Create Date: 2026-01-26 00:38:40.456670
+Revision ID: a0d823ac9e79
+Revises: 1adff5410668
+Create Date: 2026-04-21 03:00:13.474754
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '041c26078309'
-down_revision = '67433725ab6a'
+revision = 'a0d823ac9e79'
+down_revision = '1adff5410668'
 branch_labels = None
 depends_on = None
 

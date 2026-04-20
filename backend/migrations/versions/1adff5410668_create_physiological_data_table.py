@@ -1,8 +1,8 @@
 """create physiological data table
 
-Revision ID: 67433725ab6a
-Revises: 4514d29a9086
-Create Date: 2026-01-26 00:28:32.276635
+Revision ID: 1adff5410668
+Revises: 382943a3e056
+Create Date: 2026-04-21 02:59:20.521757
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '67433725ab6a'
-down_revision = '4514d29a9086'
+revision = '1adff5410668'
+down_revision = '382943a3e056'
 branch_labels = None
 depends_on = None
 
