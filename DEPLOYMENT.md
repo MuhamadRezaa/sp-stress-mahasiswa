@@ -302,3 +302,91 @@ Oleh karena itu, di VPS produksi:
 1.  **Jangan** akses port 5000 Docker secara langsung dari internet.
 2.  Gunakan Nginx host sebagai perantara (Reverse Proxy) yang memiliki SSL, lalu Nginx yang meneruskan ke localhost:5000 Docker (seperti contoh konfigurasi Nginx nomor 2 di atas).
 3.  Pastikan `VITE_API_BASE_URL` di `.env` frontend mengarah ke URL Nginx yang sudah HTTPS (misalnya `https://api.domain-anda.com`).
+---
+
+## Menjalankan Multiple Environment di Satu VPS (Prod & Dev)
+
+Jika Anda ingin menjalankan versi **Production** dan **Development/Testing** sekaligus di satu VPS yang sama, ikuti aturan pemisahan ini agar tidak terjadi konflik.
+
+### 1. Gunakan Folder Berbeda
+Lakukan clone ke folder yang berbeda:
+-   `/home/reza/sp-stress-mahasiswa` (Produksi)
+-   `/home/reza/sp-stress-mahasiswa-dev` (Development)
+
+### 2. Atur Identitas Berbeda di `.env`
+Di dalam folder **Dev**, edit file `.env` dan pastikan nilai-nilai berikut **BERBEDA** dengan versi produksi:
+
+```ini
+# 1. Berikan nama project berbeda agar container tidak saling timpa
+COMPOSE_PROJECT_NAME=spsm_dev
+
+# 2. Gunakan database yang berbeda
+MYSQL_DATABASE=stress_db_dev
+
+# 3. Sesuaikan URL Subdomain Dev
+CORS_ALLOWED_ORIGINS=https://dev.domain-anda.com
+VITE_API_BASE_URL=https://api-dev.domain-anda.com
+```
+
+### 3. Sesuaikan Port Host (Penting!)
+Agar port Docker tidak bentrok, Anda bisa mengubah port host di `docker-compose.yml` versi Dev atau menggunakan file override.
+
+Contoh sederhana, ubah port di `docker-compose.yml` folder Dev:
+-   Backend: `5001:5000` (Port 5001 host mengarah ke 5000 container)
+-   Frontend: `8080:80` (Port 8080 host mengarah ke 80 container)
+
+### 4. Konfigurasi Nginx VPS
+Buat file konfigurasi Nginx baru (misal: `/etc/nginx/sites-available/stresspresso-dev`) yang mengarah ke port Dev tersebut:
+
+```nginx
+server {
+    listen 80;
+    server_name dev.domain-anda.com;
+
+    location / {
+        proxy_pass http://localhost:8080; # Mengarah ke port frontend Dev
+        ...
+    }
+}
+
+server {
+    listen 80;
+    server_name api-dev.domain-anda.com;
+
+    location / {
+        proxy_pass http://localhost:5001; # Mengarah ke port backend Dev
+        ...
+    }
+}
+```
+
+### 5. Sinkronisasi Data (Salin dari Prod ke Dev)
+Jika Anda ingin menyalin data asli dari database produksi ke database pengembangan (untuk keperluan testing dengan data nyata):
+
+```bash
+docker compose exec db mysqldump -u spsm_user -pspsm_password stress_db | docker compose exec -T db mysql -u spsm_user -pspsm_password stress_db_dev
+```
+
+---
+
+## Tips Pemeliharaan (Maintenance)
+
+### Cara Update Kode di VPS
+Setiap kali Anda melakukan perubahan di lokal dan sudah dipush ke Git:
+
+1. Masuk ke folder project di VPS.
+2. Tarik kode terbaru: `git pull origin main`.
+3. Build ulang image:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+   ```
+4. Jika ada perubahan model database, jalankan migrasi:
+   ```bash
+   docker compose exec backend flask db upgrade
+   ```
+
+### Melihat Log (Untuk Debugging)
+Jika aplikasi error (500 Internal Server Error), cek log backend:
+```bash
+docker compose logs backend --tail=50 -f
+```

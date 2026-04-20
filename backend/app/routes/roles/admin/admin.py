@@ -77,10 +77,21 @@ def update_user(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json(silent=True) or {}
 
+    # PROTEKSI: Admin tidak boleh mengubah data/role user yang rolenya 'admin'
+    # Ini untuk mencegah admin mengubah admin lain atau dirinya sendiri menjadi role lain
+    if user.role == "admin" and "role" in data and data["role"] != "admin":
+        return jsonify({
+            "success": False, 
+            "message": "Role Admin tidak dapat diubah ke role lain demi keamanan"
+        }), 403
+
     allowed = ["name", "gender", "age", "phone", "university", "major", "semester",
                "residential_status", "role", "pa_id"]
     for field in allowed:
         if field in data:
+            # Validasi tambahan jika ingin mengubah ke role admin
+            if field == "role" and data["role"] not in ("student", "pa", "admin"):
+                continue
             setattr(user, field, data[field])
 
     try:

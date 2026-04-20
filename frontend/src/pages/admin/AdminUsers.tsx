@@ -69,6 +69,7 @@ export default function AdminUsers() {
     try {
       await updateUser(editUser.id, {
         name: formData.name,
+        role: formData.role, // Tambahkan role ke payload update
         university: formData.university || undefined,
         major: formData.major || undefined,
         semester: formData.semester ? parseInt(formData.semester) : undefined,
@@ -177,15 +178,19 @@ export default function AdminUsers() {
                       <td className="py-3 px-4 text-gray-500 dark:text-gray-400">{u.pa_name || "-"}</td>
                       <td className="py-3 px-4 text-gray-500 dark:text-gray-400">{u.university || "-"}</td>
                       <td className="py-3 px-4 text-right space-x-2">
-                        <button
-                          onClick={() => openEdit(u)}
-                          className="text-brand-500 hover:text-brand-700 dark:text-brand-400 text-xs font-medium"
-                        >Edit</button>
-                        {u.role !== "admin" && (
-                          <button
-                            onClick={() => openDeleteConfirm(u)}
-                            className="text-error-500 hover:text-error-700 dark:text-error-400 text-xs font-medium"
-                          >Hapus</button>
+                        {u.role !== "admin" ? (
+                          <>
+                            <button
+                              onClick={() => openEdit(u)}
+                              className="text-brand-500 hover:text-brand-700 dark:text-brand-400 text-xs font-medium"
+                            >Edit</button>
+                            <button
+                              onClick={() => openDeleteConfirm(u)}
+                              className="text-error-500 hover:text-error-700 dark:text-error-400 text-xs font-medium"
+                            >Hapus</button>
+                          </>
+                        ) : (
+                          <span className="text-[10px] text-gray-400 italic">Terproteksi</span>
                         )}
                       </td>
                     </tr>
@@ -219,6 +224,17 @@ export default function AdminUsers() {
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
               placeholder="Nama lengkap" />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+            <select value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+              <option value="student">Mahasiswa</option>
+              <option value="pa">Dosen PA</option>
+              {!editUser && <option value="admin">Admin</option>}
+            </select>
+          </div>
+
           {!editUser && (
             <>
               <div>
@@ -234,16 +250,6 @@ export default function AdminUsers() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
                   placeholder="••••••••" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
-                <select value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-                  <option value="student">Mahasiswa</option>
-                  <option value="pa">Dosen PA</option>
-                  <option value="admin">Admin</option>
-                </select>
               </div>
             </>
           )}
