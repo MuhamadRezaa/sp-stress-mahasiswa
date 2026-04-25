@@ -1,3 +1,4 @@
+import os
 from werkzeug.security import generate_password_hash
 from app import create_app
 from app.extensions import db
@@ -6,8 +7,9 @@ from app.models.user import User
 def main():
     app = create_app()
     with app.app_context():
-        email = "admin@example.com"
-        password = "admin12345"
+        # Baca dari environment variable, gunakan default jika tidak ada
+        email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+        password = os.getenv("ADMIN_PASSWORD", "admin12345")
 
         existing = User.query.filter_by(email=email).first()
         if existing:
