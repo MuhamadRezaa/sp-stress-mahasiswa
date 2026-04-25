@@ -10,6 +10,10 @@ from app.extensions import db
 from app.models.user import User
 from app.extensions import limiter
 
+# Library Google Auth
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
@@ -34,6 +38,82 @@ def login():
         "access_token": access_token,
         "user": user_to_dict(user)
     }), 200
+
+@auth_bp.post("/google")
+def google_login():
+    """
+    Login/Register via Google.
+    Body: { "token": "id_token_from_google" }
+    """
+    data = request.get_json(silent=True) or {}
+    token = data.get("token")
+
+    if not token:
+        return jsonify({"success": False, "message": "Token Google wajib disertakan"}), 400
+
+    try:
+        # 1. Verifikasi Token dari Google
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        email = None
+        name = None
+        google_id = None
+
+        # Coba verifikasi sebagai ID Token (JWT) dulu
+        try:
+            id_info = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
+            email = id_info.get("email").strip().lower()
+            name = id_info.get("name")
+            google_id = id_info.get("sub")
+        except Exception:
+            # Jika gagal, coba verifikasi sebagai Access Token (untuk custom button)
+            import requests as py_requests
+            userinfo_res = py_requests.get(f"https://www.googleapis.com/oauth2/v3/userinfo?access_token={token}")
+            if userinfo_res.status_code == 200:
+                user_data = userinfo_res.json()
+                email = user_data.get("email").strip().lower()
+                name = user_data.get("name")
+                google_id = user_data.get("sub")
+            else:
+                return jsonify({"success": False, "message": "Token Google tidak valid"}), 401
+
+        if not email:
+            return jsonify({"success": False, "message": "Gagal mengambil data email dari Google"}), 400
+
+        # 2. Cari user berdasarkan email
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Skenario: User sudah ada (Manual atau Google)
+            # Update google_id jika belum ada (Account Linking)
+            if not user.google_id:
+                user.google_id = google_id
+                db.session.commit()
+        else:
+            # Skenario: User baru pertama kali daftar
+            user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                role="student" # Default role
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        # 4. Generate JWT Token aplikasi kita
+        access_token = create_access_token(identity=str(user.id))
+        
+        return jsonify({
+            "success": True,
+            "message": "Login berhasil",
+            "access_token": access_token,
+            "user": user_to_dict(user)
+        }), 200
+
+    except ValueError:
+        return jsonify({"success": False, "message": "Token Google tidak valid"}), 401
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 
 
 @auth_bp.post("/register")

@@ -4,7 +4,8 @@ import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
-import { signUp } from "../../api/auth";
+import { signUp, googleLogin } from "../../api/auth";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -18,6 +19,25 @@ export default function SignUpForm() {
     email: "",
     password: "",
     confirmPassword: "",
+  });
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      try {
+        // Karena useGoogleLogin (custom button) memberikan access_token, 
+        // kita perlu ambil info user dari Google API atau sesuaikan di backend.
+        // Untuk kemudahan, kita kirim access_token ke backend baru kita.
+        await googleLogin(tokenResponse.access_token);
+        navigate("/profile");
+      } catch (err) {
+        setError("Gagal login dengan Google.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => setError("Login Google gagal."),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -93,7 +113,12 @@ export default function SignUpForm() {
 
           {/* Google Sign Up */}
           <div className="grid grid-cols-1 mb-2">
-            <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+            <button
+              type="button"
+              onClick={() => loginWithGoogle()}
+              disabled={isLoading}
+              className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+            >
               <svg
                 width="20"
                 height="20"

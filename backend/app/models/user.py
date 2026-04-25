@@ -7,7 +7,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True) # Nullable untuk user Google
+    google_id = db.Column(db.String(120), unique=True, nullable=True) # ID unik Google
     role = db.Column(db.Enum("student", "pa", "admin", name="user_role"), nullable=False, default="student")
 
     # PA assignment (for students: FK to their Dosen PA)

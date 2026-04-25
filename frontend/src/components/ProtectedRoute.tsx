@@ -51,6 +51,10 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     };
 
     checkAuth();
+
+    // Listen for profile updates from other components
+    window.addEventListener('profileUpdated', checkAuth);
+    return () => window.removeEventListener('profileUpdated', checkAuth);
   }, []);
 
   if (isLoading) {

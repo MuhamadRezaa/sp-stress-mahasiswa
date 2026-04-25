@@ -41,6 +41,13 @@ export const signUp = async (data: { name: string; email: string; password: stri
   return response.data;
 };
 
+export const googleLogin = async (token: string): Promise<string> => {
+  const response = await http.post<{ success: boolean; access_token: string; user: User; message: string }>("/auth/google", { token });
+  const { access_token } = response.data;
+  localStorage.setItem("access_token", access_token);
+  return access_token;
+};
+
 export const getMe = async (): Promise<User> => {
   const response = await http.get<{ success: boolean; user: User }>("/auth/me");
   return response.data.user;
