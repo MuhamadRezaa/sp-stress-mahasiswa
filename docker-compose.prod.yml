@@ -1,29 +1,27 @@
-# Production override — jalankan dengan:
-# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-
 services:
+  db:
+    restart: always
+
   backend:
-    command: >
-      gunicorn
-      --workers 4
-      --bind 0.0.0.0:5000
-      --timeout 120
-      --access-logfile -
-      --error-logfile -
-      "run:app"
+    restart: always
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
-    volumes: []
+    # Menggunakan Gunicorn untuk produksi
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 run:app
 
   frontend:
     build:
       context: ./frontend
-      target: prod  # Gunakan stage prod (Nginx)
+      target: prod
       args:
-        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+        - VITE_API_BASE_URL=/api
         - VITE_APP_NAME=${VITE_APP_NAME}
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+    restart: always
     ports:
-      - "80:80"   # Production: port 80 (HTTP)
-    volumes: []   # Tidak perlu hot-reload di production
-    environment: []
+      - "80:80"
+    environment:
+      - VITE_API_BASE_URL=/api
+      - VITE_APP_NAME=${VITE_APP_NAME}
+      - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}

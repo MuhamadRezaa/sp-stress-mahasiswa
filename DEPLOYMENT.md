@@ -60,18 +60,14 @@ Digunakan untuk pengujian akhir atau deployment ke server sungguhan. Frontend di
 ### 1. Atur `.env`
 
 ```ini
-# FLASK_ENV dan FLASK_DEBUG TIDAK perlu diubah
-# — akan otomatis di-override oleh docker-compose.prod.yml
-
-# CORS: ubah sesuai URL frontend di environment prod
-# CORS_ALLOWED_ORIGINS=http://localhost:5173   # nonaktifkan ini
-CORS_ALLOWED_ORIGINS=http://localhost          # aktifkan ini (prod lokal)
-# CORS_ALLOWED_ORIGINS=https://domain-anda.com  # untuk server sungguhan
+# Gunakan /api agar Nginx bisa mengarahkan trafik dengan benar
+VITE_API_BASE_URL=/api
+CORS_ALLOWED_ORIGINS=https://domain-anda.com  # URL frontend Anda
 ```
 
 ### 2. Jalankan
 
-> ⚠️ **Selalu gunakan `--build`** saat ganti mode karena image Docker berubah.
+> ⚠️ **Selalu gunakan `--build`** saat pertama kali deploy atau saat ada perubahan kode.
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -81,204 +77,36 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 | Layanan  | URL                       |
 |----------|---------------------------|
-| Frontend | http://localhost *(port 80)* |
-| Backend  | http://localhost:5000     |
-| Database | localhost:3307 (MySQL)    |
-
-### Karakteristik Prod Mode
-
-| Aspek          | Kondisi                                   |
-|----------------|-------------------------------------------|
-| Backend server | `gunicorn` (4 workers paralel)            |
-| Frontend       | Nginx melayani file hasil `npm run build` |
-| Debug          | ❌ Mati (error tidak tampil ke pengguna)  |
-| Hot-reload     | ❌ Tidak ada                              |
-| Source code    | Di-*bake* ke dalam image                 |
+| Frontend | http://localhost (port 80) |
+| Backend  | http://localhost/api      |
 
 ---
 
-## Ringkasan Perintah
+## Setup Nginx di VPS (Reverse Proxy & SSL)
 
-```bash
-# ── Development ───────────────────────────────────────────
-# Jalankan (pertama kali / setelah ubah dependencies)
-docker compose up -d --build
+Gunakan **Nginx di server VPS Anda** (di luar Docker) untuk menangani HTTPS dan meneruskan trafik ke Docker.
 
-# Jalankan (tanpa ubah dependencies)
-docker compose down && docker compose up -d
+1.  **Konfigurasi Nginx (Rekomendasi: Satu domain dengan path `/api/`)**
+    ```nginx
+    server {
+        listen 80;
+        server_name domain-anda.com www.domain-anda.com;
 
-# Hentikan
-docker compose down
+        # Frontend & API (Semua dilempar ke port 80 Docker Frontend)
+        # Nginx di dalam Docker Frontend yang akan membagi ke / dan /api
+        location / {
+            proxy_pass http://localhost:80; 
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+    ```
 
-# ── Production ────────────────────────────────────────────
-# Jalankan (selalu --build saat ganti mode)
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-
-# Hentikan
-docker compose down
-
-# ── Utilitas ─────────────────────────────────────────────
-# Cek status container
-docker compose ps
-
-# Lihat log backend
-docker compose logs backend --tail=30 -f
-
-# Verifikasi env yang aktif di container
-docker compose exec backend env | grep -E "FLASK|CORS"
-```
-
----
-
-## Checklist Ganti Mode Dev → Prod
-
-- [ ] Di `.env`: ganti `CORS_ALLOWED_ORIGINS` ke `http://localhost` (atau domain server)
-- [ ] Jalankan dengan flag `-f docker-compose.prod.yml`
-- [ ] Selalu tambahkan `--build`
-- [ ] Akses via `http://localhost` (bukan `:5173`)
-
-## Checklist Ganti Mode Prod → Dev
-
-- [ ] Di `.env`: ganti `CORS_ALLOWED_ORIGINS` kembali ke `http://localhost:5173`
-- [ ] Jalankan **tanpa** flag `-f docker-compose.prod.yml`
-- [ ] Selalu tambahkan `--build`
-- [ ] Akses via `http://localhost:5173`
-
----
-
-## Aturan Kapan Perlu `--build`
-
-| Situasi                                          | Perlu `--build`? |
-|--------------------------------------------------|:----------------:|
-| Ganti mode dev ↔ prod                           | ✅ Ya            |
-| Ubah `requirements.txt` atau `package.json`      | ✅ Ya            |
-| Ubah `Dockerfile`                                | ✅ Ya            |
-| Ubah kode Python / TypeScript (mode dev)         | ❌ Tidak         |
-| Ubah nilai `.env`                                | ❌ Tidak (cukup `down` + `up`) |
-
----
-
-## Deployment ke Server (Produksi Nyata)
-
-1. Salin seluruh project ke server
-2. Buat file `.env` di server (jangan di-commit ke git!)
-3. Isi nilai produksi yang sesuai:
-   ```ini
-   CORS_ALLOWED_ORIGINS=https://domain-anda.com
-   VITE_API_BASE_URL=https://domain-anda.com:5000
-   SECRET_KEY=<string acak 64 karakter>
-   JWT_SECRET_KEY=<string acak 64 karakter>
-   MYSQL_ROOT_PASSWORD=<password kuat>
-   MYSQL_PASSWORD=<password kuat>
-   ```
-4. Generate secret key:
-   ```bash
-   python3 -c "import secrets; print(secrets.token_hex(32))"
-   ```
-5. Jalankan mode production:
-   ```bash
-   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-   ```
-
----
-
-## Setup HTTPS (SSL) di VPS
-
-Secara bawaan, konfigurasi Docker yang kita buat menggunakan protokol **HTTP** (port 80 untuk frontend dan port 5000 untuk backend). HTTPS **belum** disetup di dalam Docker.
-
-Ini adalah praktik terbaik (Best Practice). Mengapa? Karena manajemen sertifikat SSL lebih baik dilakukan di level server host menggunakan **Reverse Proxy** (seperti Nginx di host server atau Caddy), bukan di dalam container Docker.
-
-### Cara Menambahkan HTTPS (Rekomendasi)
-
-Gunakan **Nginx di server VPS Anda** (di luar Docker) dan **Certbot** (Let's Encrypt).
-
-1.  **Install Nginx dan Certbot di VPS:**
+2.  **Aktifkan SSL dengan Certbot:**
     ```bash
-    sudo apt update
-    sudo apt install nginx certbot python3-certbot-nginx
-    ```
-
-2.  **Buat file konfigurasi Nginx baru untuk domain Anda:**
-    ```bash
-    sudo nano /etc/nginx/sites-available/stresspresso
-    ```
-
-    Isi file tersebut dengan salah satu konfigurasi di bawah ini, tergantung opsi mana yang Anda pilih di `.env`.
-
-    **Konfigurasi untuk Opsi A (Menggunakan port 5000 langsung)**
-    *(⚠️ Peringatan: Sangat tidak direkomendasikan. Certbot Nginx biasanya hanya mengonfigurasi SSL/HTTPS untuk port default 443. Jika Anda memakai ini, Anda harus mengatur sertifikat SSL manual untuk port 5000, jika tidak akan terjadi error Mixed Content).*
-    ```nginx
-    server {
-        listen 80;
-        server_name domain-anda.com www.domain-anda.com;
-
-        # Frontend saja
-        location / {
-            proxy_pass http://localhost:80;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-    # Backend tidak diatur oleh Nginx, melainkan diakses langsung via port 5000 (harus open port di firewall).
-    ```
-
-    **ATAU - Konfigurasi untuk Opsi B (Rekomendasi: Subdomain terpisah `api.domain.com`)**
-    ```nginx
-    # 1. Block untuk Frontend (https://domain-anda.com)
-    server {
-        listen 80;
-        server_name domain-anda.com www.domain-anda.com;
-
-        location / {
-            proxy_pass http://localhost:80; # Nginx melempar ke port 80 Docker Frontend
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-
-    # 2. Block untuk Backend API (https://api.domain-anda.com)
-    server {
-        listen 80;
-        server_name api.domain-anda.com;
-
-        location / {
-            proxy_pass http://localhost:5000; # Nginx melempar ke port 5000 Docker Backend
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-    ```
-
-    **ATAU - Konfigurasi untuk Opsi C (Satu domain dengan path `/api/`)**
-    ```nginx
-    server {
-        listen 80;
-        server_name domain-anda.com www.domain-anda.com;
-
-        # Frontend dilayani di root path (/)
-        location / {
-            proxy_pass http://localhost:80;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-        # Backend dilayani di path (/api/)
-        location /api/ {
-            proxy_pass http://localhost:5000/; # Slash di akhir sangat penting!
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
+    sudo certbot --nginx -d domain-anda.com -d www.domain-anda.com
     ```
 
 3.  **Aktifkan konfigurasi Nginx:**
