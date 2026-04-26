@@ -1,4 +1,4 @@
-# Panduan Deployment — Stresspresso
+# Panduan Deployment — Monitoring Stress Mahasiswa (SPSM)
 
 Dokumen ini menjelaskan cara menjalankan aplikasi dalam mode **Development** dan **Production**, baik di lokal maupun di server.
 
@@ -55,23 +55,33 @@ docker compose down && docker compose up -d
 
 ## Mode Production (Lokal / Server)
 
-Digunakan untuk pengujian akhir atau deployment ke server sungguhan. Frontend di-*build* menjadi file statis yang dilayani oleh **Nginx**, backend menggunakan **Gunicorn**.
+## Mode Operasi Docker
 
-### 1. Atur `.env`
+Terdapat 3 mode yang bisa Anda gunakan dalam proyek ini:
 
-```ini
-# Gunakan /api agar Nginx bisa mengarahkan trafik dengan benar
-VITE_API_BASE_URL=/api
-CORS_ALLOWED_ORIGINS=https://domain-anda.com  # URL frontend Anda
-```
+### 1. Mode Development (Ngoding)
+Digunakan saat Anda sedang menulis kode. Fitur *Hot Reload* aktif.
+- **Akses**: `http://localhost:5173`
+- **Perintah**:
+  ```bash
+  docker compose up -d --build
+  ```
 
-### 2. Jalankan
+### 2. Mode Simulasi Produksi (Tes Lokal)
+Digunakan untuk mengetes apakah build Nginx berjalan lancar di laptop sebelum dideploy ke VPS. Tanpa SSL.
+- **Akses**: `http://localhost` (Port 80)
+- **Perintah**:
+  ```bash
+  docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+  ```
 
-> ⚠️ **Selalu gunakan `--build`** saat pertama kali deploy atau saat ada perubahan kode.
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
+### 3. Mode Produksi Asli (VPS)
+Digunakan untuk server sungguhan dengan domain asli dan SSL (HTTPS).
+- **Akses**: `https://your-domain.com`
+- **Perintah**:
+  ```bash
+  sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+  ```
 
 ### 3. Akses
 
@@ -111,7 +121,7 @@ Gunakan **Nginx di server VPS Anda** (di luar Docker) untuk menangani HTTPS dan 
 
 3.  **Aktifkan konfigurasi Nginx:**
     ```bash
-    sudo ln -s /etc/nginx/sites-available/stresspresso /etc/nginx/sites-enabled/
+    sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
     sudo nginx -t
     sudo systemctl reload nginx
     ```
@@ -164,7 +174,7 @@ Contoh sederhana, ubah port di `docker-compose.yml` folder Dev:
 -   Frontend: `8080:80` (Port 8080 host mengarah ke 80 container)
 
 ### 4. Konfigurasi Nginx VPS
-Buat file konfigurasi Nginx baru (misal: `/etc/nginx/sites-available/stresspresso-dev`) yang mengarah ke port Dev tersebut:
+Buat file konfigurasi Nginx baru (misal: `/etc/nginx/sites-available/myapp-dev`) yang mengarah ke port Dev tersebut:
 
 ```nginx
 server {
