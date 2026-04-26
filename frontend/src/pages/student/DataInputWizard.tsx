@@ -382,7 +382,7 @@ export default function DataInputWizard() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                  📱 Aktivitas Digital
+                  Aktivitas Digital
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                   Data penggunaan smartphone dan media sosial
@@ -406,7 +406,7 @@ export default function DataInputWizard() {
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="social_media_access_count">Frekuensi Media Sosial</Label>
+                  <Label htmlFor="social_media_access_count">Frekuensi Akses Media Sosial</Label>
                   <select
                     id="social_media_access_count"
                     name="social_media_access_count"
@@ -479,27 +479,15 @@ export default function DataInputWizard() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                  ❤️ Data Fisiologis
+                  Data Fisiologis
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                  Data kesehatan dan aktivitas fisik Anda
+                  Data kesehatan dan aktivitas fisik Anda dari Smartwatch/Smartband
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="heart_rate_avg">Heart Rate Avg (bpm)</Label>
-                  <Input
-                    type="number"
-                    id="heart_rate_avg"
-                    name="heart_rate_avg"
-                    placeholder="70"
-                    min="0"
-                    value={formData.heart_rate_avg}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="heart_rate_min">Heart Rate Min (bpm)</Label>
+                  <Label htmlFor="heart_rate_min">Detak Jantung Minimum (bpm)</Label>
                   <Input
                     type="number"
                     id="heart_rate_min"
@@ -511,7 +499,19 @@ export default function DataInputWizard() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="heart_rate_max">Heart Rate Max (bpm)</Label>
+                  <Label htmlFor="heart_rate_avg">Rata-Rata Detak Jantung (bpm)</Label>
+                  <Input
+                    type="number"
+                    id="heart_rate_avg"
+                    name="heart_rate_avg"
+                    placeholder="70"
+                    min="0"
+                    value={formData.heart_rate_avg}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="heart_rate_max">Detak Jantung Maksimum (bpm)</Label>
                   <Input
                     type="number"
                     id="heart_rate_max"
@@ -556,7 +556,7 @@ export default function DataInputWizard() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                  📋 Kuesioner PSS-10
+                  Kuesioner PSS-10
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                   Pilih jawaban sesuai kondisi Anda dalam 1 bulan terakhir
