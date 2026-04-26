@@ -21,7 +21,14 @@ services:
     restart: always
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      # Menukar template HTTP (default) dengan template SSL khusus untuk VPS
+      - ./frontend/nginx.ssl.conf.template:/etc/nginx/templates/default.conf.template:ro
+      # Memetakan sertifikat SSL dari host VPS
+      - /etc/letsencrypt:/etc/nginx/ssl:ro
     environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
       - VITE_API_BASE_URL=/api
       - VITE_APP_NAME=${VITE_APP_NAME}
       - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
