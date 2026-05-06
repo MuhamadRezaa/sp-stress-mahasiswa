@@ -19,13 +19,13 @@ export default function AuthLayout({
             <GridShape />
             <div className="flex flex-col items-center max-w-xs">
               <Link to="/" className="flex items-center gap-3 mb-6">
-                {/* <img
+                <img
                   width={48}
                   height={48}
-                  src="/images/logo/logo-icon.svg"
+                  src="/images/logo/icon-spsm.svg"
                   alt="Logo"
                   className="w-12 h-12"
-                /> */}
+                />
                 <h1 className="text-3xl font-extrabold text-white tracking-tight">
                   {appName}
                 </h1>
