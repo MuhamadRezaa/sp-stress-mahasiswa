@@ -2,6 +2,7 @@ import React from "react";
 import GridShape from "../../components/common/GridShape";
 import { Link } from "react-router";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
+import { appName } from "../../components/common/PageMeta";
 
 export default function AuthLayout({
   children,
@@ -26,7 +27,7 @@ export default function AuthLayout({
                   className="w-12 h-12"
                 /> */}
                 <h1 className="text-3xl font-extrabold text-white tracking-tight">
-                  Stresspresso
+                  {appName}
                 </h1>
               </Link>
               <p className="text-center text-gray-400 dark:text-white/60">
@@ -35,7 +36,7 @@ export default function AuthLayout({
             </div>
           </div>
         </div>
-        <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
+        <div className="fixed z-50 bottom-6 right-6">
           <ThemeTogglerTwo />
         </div>
       </div>

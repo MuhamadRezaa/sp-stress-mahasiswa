@@ -64,6 +64,7 @@ def google_login():
             email = id_info.get("email").strip().lower()
             name = id_info.get("name")
             google_id = id_info.get("sub")
+            picture = id_info.get("picture") # Ambil foto profil
         except Exception:
             # Jika gagal, coba verifikasi sebagai Access Token (untuk custom button)
             import requests as py_requests
@@ -73,6 +74,7 @@ def google_login():
                 email = user_data.get("email").strip().lower()
                 name = user_data.get("name")
                 google_id = user_data.get("sub")
+                picture = user_data.get("picture") # Ambil foto profil
             else:
                 return jsonify({"success": False, "message": "Token Google tidak valid"}), 401
 
@@ -84,16 +86,22 @@ def google_login():
 
         if user:
             # Skenario: User sudah ada (Manual atau Google)
-            # Update google_id jika belum ada (Account Linking)
+            # Update google_id dan profile_picture jika belum ada
             if not user.google_id:
                 user.google_id = google_id
-                db.session.commit()
+            
+            # Jika belum ada foto profil, gunakan foto dari Google
+            if not user.profile_picture and picture:
+                user.profile_picture = picture
+                
+            db.session.commit()
         else:
             # Skenario: User baru pertama kali daftar
             user = User(
                 name=name,
                 email=email,
                 google_id=google_id,
+                profile_picture=picture, # Simpan foto dari Google
                 role="student" # Default role
             )
             db.session.add(user)

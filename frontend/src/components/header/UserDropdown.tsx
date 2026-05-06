@@ -32,6 +32,9 @@ export default function UserDropdown() {
 
   const getProfileImageUrl = () => {
     if (user?.profile_picture) {
+      if (user.profile_picture.startsWith("http")) {
+        return user.profile_picture;
+      }
       const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
       return `${baseUrl}${user.profile_picture}`;
     }

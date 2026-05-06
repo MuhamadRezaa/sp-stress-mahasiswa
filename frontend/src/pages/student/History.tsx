@@ -267,7 +267,7 @@ export default function History() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-none">
-                      <TableCell isHeader className="px-6 py-4">
+                      <TableCell isHeader className="px-6 py-4 text-gray-800 dark:text-white">
                         <div className="flex items-center gap-2">
                           Tanggal
                           <div className="flex flex-col text-gray-300 dark:text-gray-600">
@@ -276,7 +276,7 @@ export default function History() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell isHeader className="px-6 py-4 text-nowrap">
+                      <TableCell isHeader className="px-6 py-4 text-nowrap text-gray-800 dark:text-white">
                         <div className="flex items-center gap-2">
                           Jenis Hari
                           <div className="flex flex-col text-gray-300 dark:text-gray-600">
@@ -285,7 +285,7 @@ export default function History() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell isHeader className="px-6 py-4 text-nowrap">
+                      <TableCell isHeader className="px-6 py-4 text-nowrap text-gray-800 dark:text-white">
                         <div className="flex items-center gap-2">
                           Skor PSS-10
                           <div className="flex flex-col text-gray-300 dark:text-gray-600">
@@ -294,7 +294,7 @@ export default function History() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell isHeader className="px-6 py-4 text-nowrap">
+                      <TableCell isHeader className="px-6 py-4 text-nowrap text-gray-800 dark:text-white">
                         <div className="flex items-center gap-2">
                           Tingkat Stres
                           <div className="flex flex-col text-gray-300 dark:text-gray-600">
@@ -303,7 +303,7 @@ export default function History() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell isHeader className="px-6 py-4">Aksi</TableCell>
+                      <TableCell isHeader className="px-6 py-4 text-gray-800 dark:text-white">Aksi</TableCell>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">

@@ -8,6 +8,75 @@ import { http } from "../../api/http";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 
+// Custom CSS for DayPicker v9 Dark Mode
+const calendarDarkModeStyles = `
+  /* Gaya Dasar Tanggal */
+  .rdp-day {
+    border-radius: 50% !important;
+    transition: all 0.2s ease;
+  }
+  .dark .rdp-day {
+    color: #f1f5f9 !important;
+  }
+
+  /* 1. TANGGAL YANG SUDAH DIISI (Exist) */
+  .rdp-day_exist {
+    background-color: #10b981 !important; /* Emerald 500 */
+    color: white !important;
+    font-weight: bold !important;
+  }
+  .dark .rdp-day_exist {
+    background-color: #059669 !important; /* Emerald 600 */
+    color: white !important;
+  }
+
+  /* 2. TANGGAL HARI INI (Today) */
+  .rdp-day_today {
+    border: 2px solid #3b82f6 !important; /* Blue 500 */
+    color: #3b82f6 !important;
+  }
+  .dark .rdp-day_today {
+    border-color: #60a5fa !important;
+    color: #60a5fa !important;
+  }
+
+  /* 3. KOMBINASI: HARI INI + SUDAH DIISI */
+  .rdp-day_today.rdp-day_exist {
+    background-color: #10b981 !important;
+    border: 2px solid #3b82f6 !important;
+    color: white !important;
+  }
+
+  /* 4. TANGGAL TERPILIH (Selected) */
+  .rdp-day_selected {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .dark .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_exist) {
+    background-color: #334155 !important;
+    color: white !important;
+  }
+
+  /* Navigasi dan Label */
+  .dark .rdp-nav {
+    color: #f1f5f9 !important;
+  }
+  .dark .rdp-caption_label {
+    color: #f1f5f9 !important;
+  }
+  .dark .rdp-weekday {
+    color: #94a3b8 !important;
+  }
+  .dark .rdp-button {
+    color: inherit;
+  }
+  .dark .rdp-button:hover {
+    background-color: #334155 !important;
+  }
+`;
+
 // PSS-10 Questions (Q7-Q10 are reverse scored on backend)
 const PSS_QUESTIONS = [
   "Seberapa sering kamu merasa kesal karena hal yang terjadi tiba-tiba?",
@@ -148,6 +217,16 @@ export default function DataInputWizard() {
       setError("Semua field wajib diisi");
       return false;
     }
+
+    const min = parseInt(formData.heart_rate_min);
+    const avg = parseFloat(formData.heart_rate_avg);
+    const max = parseInt(formData.heart_rate_max);
+
+    if (min > avg || avg > max) {
+      setError("Urutan data detak jantung tidak logis! (Harus: Minimum <= Rata-rata <= Maksimum)");
+      return false;
+    }
+
     return true;
   };
 
@@ -278,6 +357,7 @@ export default function DataInputWizard() {
         description="Form input data harian"
       />
 
+      <style>{calendarDarkModeStyles}</style>
       <div className="w-full">
         {/* Progress Steps */}
         <div className="max-w-4xl mx-auto mb-8">
@@ -339,7 +419,7 @@ export default function DataInputWizard() {
                   }}
                   modifiers={{ exist: completedDates }}
                   modifiersClassNames={{
-                    exist: "bg-success-100 text-success-700 font-bold dark:bg-success-900/40 rounded-full",
+                    exist: "rdp-day_exist",
                   }}
                   disabled={[{ after: new Date() }, ...completedDates]} // Tidak bisa pilih masa depan dan yang sudah diisi
                 />

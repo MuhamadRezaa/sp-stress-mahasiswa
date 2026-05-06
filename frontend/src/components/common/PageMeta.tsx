@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 
-const appName = import.meta.env.VITE_APP_NAME || "Stresspresso";
+export const appName = import.meta.env.VITE_APP_NAME || "Stresspresso";
 
 const PageMeta = ({
   title,

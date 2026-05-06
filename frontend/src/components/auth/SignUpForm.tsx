@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { signUp, googleLogin } from "../../api/auth";
 import { useGoogleLogin } from "@react-oauth/google";
+import { appName } from "../common/PageMeta";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function SignUpForm() {
         // kita perlu ambil info user dari Google API atau sesuaikan di backend.
         // Untuk kemudahan, kita kirim access_token ke backend baru kita.
         await googleLogin(tokenResponse.access_token);
-        navigate("/profile");
+        navigate("/");
       } catch (err) {
         setError("Gagal login dengan Google.");
         console.error(err);
@@ -74,8 +75,8 @@ export default function SignUpForm() {
         role: "student",
       });
 
-      // Token sudah disimpan di localStorage oleh signUp, langsung arahkan ke profil
-      navigate("/profile");
+      // Token sudah disimpan di localStorage oleh signUp, biarkan sistem yang arahkan
+      navigate("/");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const axiosError = err as { response?: { data?: { message?: string } } };
@@ -91,6 +92,20 @@ export default function SignUpForm() {
   return (
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto py-10">
+        {/* Logo for Mobile/Tablet (Visible only below 1024px) */}
+        <div className="flex justify-center mb-8 lg:hidden">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500 shadow-brand-500/20">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-gray-800 dark:text-white">
+              {appName}
+            </span>
+          </Link>
+        </div>
+
         <div>
           <div className="mb-6">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
