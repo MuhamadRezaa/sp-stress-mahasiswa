@@ -27,6 +27,7 @@ export interface PhysioData {
   heart_rate_max: number;
   step_count: number;
   sleep_duration_hours: number;
+  hrv_avg: number | null;
 }
 
 export interface PSS10Data {

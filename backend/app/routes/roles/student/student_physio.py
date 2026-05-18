@@ -35,6 +35,7 @@ def upsert_physio():
             "heart_rate_max": int(data["heart_rate_max"]),
             "step_count": int(data["step_count"]),
             "sleep_duration_hours": float(data["sleep_duration_hours"]),
+            "hrv_avg": int(data.get("hrv_avg")) if data.get("hrv_avg") is not None else None,
         }
     except Exception:
         return jsonify({"success": False, "message": "Format data tidak valid"}), 400
@@ -84,6 +85,7 @@ def history_physio():
                 "heart_rate_max": r.heart_rate_max,
                 "step_count": r.step_count,
                 "sleep_duration_hours": r.sleep_duration_hours,
+                "hrv_avg": r.hrv_avg,
             }
             for r in records
         ]

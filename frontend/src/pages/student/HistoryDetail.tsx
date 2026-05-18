@@ -191,6 +191,10 @@ export default function HistoryDetail() {
                   <span className="text-gray-500 dark:text-gray-400">Durasi Tidur</span>
                   <span className="font-medium text-gray-800 dark:text-white">{item.physio.sleep_duration_hours} jam</span>
                 </p>
+                <p className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500 dark:text-gray-400">Rata-Rata HRV</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{item.physio.hrv_avg ?? "-"} ms</span>
+                </p>
               </div>
             ) : (
               <p className="text-sm text-gray-400 italic">Tidak ada data</p>

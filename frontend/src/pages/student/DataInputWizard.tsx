@@ -116,6 +116,7 @@ interface FormData {
   heart_rate_max: string;
   step_count: string;
   sleep_duration_hours: string;
+  hrv_avg: string;
   // PSS-10
   pss_answers: number[];
 }
@@ -161,6 +162,7 @@ export default function DataInputWizard() {
     heart_rate_max: "",
     step_count: "",
     sleep_duration_hours: "",
+    hrv_avg: "",
     pss_answers: Array(10).fill(-1),
   });
 
@@ -283,6 +285,7 @@ export default function DataInputWizard() {
         heart_rate_max: parseInt(formData.heart_rate_max),
         step_count: parseInt(formData.step_count),
         sleep_duration_hours: parseFloat(formData.sleep_duration_hours),
+        hrv_avg: formData.hrv_avg ? parseInt(formData.hrv_avg) : null,
       });
 
       // Submit PSS-10
@@ -599,6 +602,18 @@ export default function DataInputWizard() {
                     placeholder="100"
                     min="0"
                     value={formData.heart_rate_max}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="hrv_avg">Rata-Rata HRV (ms) <span className="text-xs font-normal text-gray-400">(Opsional)</span></Label>
+                  <Input
+                    type="number"
+                    id="hrv_avg"
+                    name="hrv_avg"
+                    placeholder="45"
+                    min="0"
+                    value={formData.hrv_avg}
                     onChange={handleChange}
                   />
                 </div>

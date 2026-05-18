@@ -11,6 +11,7 @@ class PhysiologicalData(db.Model):
     heart_rate_avg = db.Column(db.Integer, nullable=False)
     heart_rate_min = db.Column(db.Integer, nullable=False)
     heart_rate_max = db.Column(db.Integer, nullable=False)
+    hrv_avg = db.Column(db.Integer, nullable=True) # Tambah HRV
 
     step_count = db.Column(db.Integer, nullable=False)
     sleep_duration_hours = db.Column(db.Float, nullable=False)
