@@ -143,7 +143,7 @@ export default function AdminAssignPA() {
                       />
                     </th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-500 dark:text-gray-400">Mahasiswa</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-500 dark:text-gray-400">Program Studi</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-500 dark:text-gray-400">Jurusan</th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-500 dark:text-gray-400">Dosen PA Saat Ini</th>
                     <th className="text-right py-3 px-4 font-semibold text-gray-500 dark:text-gray-400">Aksi</th>
                   </tr>

@@ -190,7 +190,7 @@ def update_profile():
     
     # Conditional fields based on role
     if user.role == "student":
-        allowed_fields.extend(["university", "major", "semester", "residential_status"])
+        allowed_fields.extend(["university", "major", "semester", "residential_status", "wearable_device"])
     elif user.role == "pa":
         allowed_fields.extend(["university", "major"])
 
@@ -294,6 +294,7 @@ def user_to_dict(user):
         "residential_status": user.residential_status,
         "phone": user.phone,
         "profile_picture": user.profile_picture,
+        "wearable_device": user.wearable_device,
         "pa_id": user.pa_id,
         "pa_name": user.pa.name if user.pa else None,
     }

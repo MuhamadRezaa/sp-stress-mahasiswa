@@ -86,7 +86,7 @@ def update_user(user_id):
         }), 403
 
     allowed = ["name", "gender", "age", "phone", "university", "major", "semester",
-               "residential_status", "role", "pa_id"]
+               "residential_status", "role", "pa_id", "wearable_device"]
     for field in allowed:
         if field in data:
             # Validasi tambahan jika ingin mengubah ke role admin
@@ -290,6 +290,7 @@ def export_data():
             "gender": student.gender or "",
             "age": student.age or "",
             "residential_status": student.residential_status or "",
+            "wearable_device": student.wearable_device or "",
             "pa_name": pa_name or "",
             # Tanggal
             "activity_date": act_date.isoformat(),
@@ -358,6 +359,7 @@ def _user_summary(user: User) -> dict:
         "semester": user.semester,
         "residential_status": user.residential_status,
         "phone": user.phone,
+        "wearable_device": user.wearable_device,
         "pa_id": user.pa_id,
         "pa_name": user.pa.name if user.pa else None,
         "created_at": user.created_at.isoformat(),

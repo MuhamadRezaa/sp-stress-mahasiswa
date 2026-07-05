@@ -84,7 +84,7 @@ const AppHeader: React.FC = () => {
 
           <Link to="/" className="flex items-center gap-2 lg:hidden">
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/icon-spsm.svg"
               alt="Logo"
               width={28}
               height={28}

@@ -77,7 +77,7 @@ export default function UserMetaCard({ user, onUpdate }: UserMetaCardProps) {
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
+          <div className="flex flex-col items-center w-full gap-6 xl:flex-row xl:w-auto">
             <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
               <img
                 src={getProfileImageUrl()}
@@ -96,7 +96,7 @@ export default function UserMetaCard({ user, onUpdate }: UserMetaCardProps) {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between xl:flex-col xl:items-end xl:gap-2">
+          <div className="flex items-center justify-center xl:flex-col xl:items-end xl:gap-2">
             <button
               onClick={openModal}
               className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"

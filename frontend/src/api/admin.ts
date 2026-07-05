@@ -72,7 +72,7 @@ export const getStressDistribution = async (): Promise<StressDistribution & { to
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export const exportData = (startDate?: string, endDate?: string): void => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
   const params = new URLSearchParams();
   if (startDate) params.append("start_date", startDate);
   if (endDate) params.append("end_date", endDate);

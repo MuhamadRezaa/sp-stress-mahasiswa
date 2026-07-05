@@ -23,6 +23,7 @@ export default function AdminUsers() {
   const [formData, setFormData] = useState({
     name: "", email: "", password: "", role: "student",
     university: "", major: "", semester: "",
+    gender: "", age: "", phone: "", residential_status: "", wearable_device: "",
   });
 
   const fetchUsers = async () => {
@@ -31,7 +32,7 @@ export default function AdminUsers() {
       const data = await listUsers(roleFilter || undefined);
       // Urutkan: Admin -> PA -> Student
       const roleOrder: Record<string, number> = { admin: 1, pa: 2, student: 3 };
-      const sortedData = [...data].sort((a, b) => 
+      const sortedData = [...data].sort((a, b) =>
         (roleOrder[a.role] || 99) - (roleOrder[b.role] || 99)
       );
       setUsers(sortedData);
@@ -45,7 +46,11 @@ export default function AdminUsers() {
   useEffect(() => { fetchUsers(); }, [roleFilter]);
 
   const resetForm = () =>
-    setFormData({ name: "", email: "", password: "", role: "student", university: "", major: "", semester: "" });
+    setFormData({
+      name: "", email: "", password: "", role: "student",
+      university: "", major: "", semester: "",
+      gender: "", age: "", phone: "", residential_status: "", wearable_device: "",
+    });
 
   const handleCreate = async () => {
     try {
@@ -69,10 +74,15 @@ export default function AdminUsers() {
     try {
       await updateUser(editUser.id, {
         name: formData.name,
-        role: formData.role, // Tambahkan role ke payload update
+        role: formData.role,
         university: formData.university || undefined,
         major: formData.major || undefined,
         semester: formData.semester ? parseInt(formData.semester) : undefined,
+        gender: (formData.gender as "L" | "P") || undefined,
+        age: formData.age ? parseInt(formData.age) : undefined,
+        phone: formData.phone || undefined,
+        residential_status: formData.residential_status || undefined,
+        wearable_device: formData.wearable_device || undefined,
       });
       setEditUser(null);
       resetForm();
@@ -103,9 +113,18 @@ export default function AdminUsers() {
   const openEdit = (u: AdminUser) => {
     setEditUser(u);
     setFormData({
-      name: u.name, email: u.email, password: "", role: u.role,
-      university: u.university || "", major: u.major || "",
+      name: u.name,
+      email: u.email,
+      password: "",
+      role: u.role,
+      university: u.university || "",
+      major: u.major || "",
       semester: u.semester?.toString() || "",
+      gender: u.gender || "",
+      age: u.age?.toString() || "",
+      phone: u.phone || "",
+      residential_status: u.residential_status || "",
+      wearable_device: u.wearable_device || "",
     });
   };
 
@@ -190,7 +209,7 @@ export default function AdminUsers() {
                             >Hapus</button>
                           </>
                         ) : (
-                          <span className="text-[10px] text-gray-400 italic">Terproteksi</span>
+                          <span className="text-[10px] text-gray-400 italic">-</span>
                         )}
                       </td>
                     </tr>
@@ -205,9 +224,9 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Modal */}
-      <Modal 
-        isOpen={showCreateModal || !!editUser} 
+      {/* Modal Edit User */}
+      <Modal
+        isOpen={showCreateModal || !!editUser}
         onClose={() => { setShowCreateModal(false); setEditUser(null); resetForm(); }}
         className="max-w-md p-6"
         showCloseButton={false}
@@ -253,29 +272,98 @@ export default function AdminUsers() {
               </div>
             </>
           )}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Universitas</label>
-            <input type="text" value={formData.university}
-              onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
-              placeholder="Nama universitas" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+          {editUser && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program Studi</label>
-              <input type="text" value={formData.major}
-                onChange={(e) => setFormData({ ...formData, major: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
-                placeholder="Prodi" />
+              <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
+              <input type="text" value={formData.email} disabled
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800/50 dark:border-gray-800 dark:text-gray-400 cursor-not-allowed" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
-              <input type="number" value={formData.semester} min={1} max={14}
-                onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
-                placeholder="1-14" />
-            </div>
-          </div>
+          )}
+
+          {formData.role !== "admin" && (
+            <>
+              {/* Phone, Gender, and Age for PA and Student */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor Telepon</label>
+                  <input type="text" value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                    placeholder="628xxx" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Umur</label>
+                  <input type="number" value={formData.age}
+                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                    placeholder="Umur" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Kelamin</label>
+                <select value={formData.gender}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                  <option value="">Pilih Jenis Kelamin</option>
+                  <option value="L">Laki-Laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Universitas</label>
+                <input type="text" value={formData.university}
+                  onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                  placeholder="Nama universitas" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className={formData.role === "student" ? "col-span-1" : "col-span-2"}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jurusan</label>
+                  <input type="text" value={formData.major}
+                    onChange={(e) => setFormData({ ...formData, major: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                    placeholder="Jurusan" />
+                </div>
+                {formData.role === "student" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
+                    <input type="number" value={formData.semester} min={1} max={14}
+                      onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                      placeholder="1-14" />
+                  </div>
+                )}
+              </div>
+
+              {/* Student-only fields */}
+              {formData.role === "student" && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status Tempat Tinggal</label>
+                    <select value={formData.residential_status}
+                      onChange={(e) => setFormData({ ...formData, residential_status: e.target.value })}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                      <option value="">Pilih Status</option>
+                      <option value="Kos">Kos</option>
+                      <option value="Rumah Orang Tua">Rumah Orang Tua</option>
+                      <option value="Asrama">Asrama</option>
+                      <option value="Lainnya">Lainnya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perangkat Wearable</label>
+                    <input type="text" value={formData.wearable_device}
+                      onChange={(e) => setFormData({ ...formData, wearable_device: e.target.value })}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                      placeholder="Xiaomi Mi Band 10, Huawei Band 11, dll." />
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
         <div className="flex gap-3 mt-6">
           <button

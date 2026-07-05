@@ -24,5 +24,6 @@ class User(db.Model):
     residential_status = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     profile_picture = db.Column(db.String(255), nullable=True)
+    wearable_device = db.Column(db.String(150), nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

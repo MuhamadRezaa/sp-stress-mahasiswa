@@ -12,10 +12,10 @@ student_pss10_bp = Blueprint("student_pss10", __name__, url_prefix="/student/pss
 def compute_pss10_score(answers: dict) -> int:
     """
     answers: {"q1":0..4, ..., "q10":0..4}
-    Q1-Q6: normal scoring (0-4)
-    Q7-Q10: reverse scoring (4-0)
+    Q1, Q2, Q3, Q6, Q9, Q10: normal scoring (0-4)
+    Q4, Q5, Q7, Q8: reverse scoring (4-0)
     """
-    reverse_items = {"q7", "q8", "q9", "q10"}
+    reverse_items = {"q4", "q5", "q7", "q8"}
     total = 0
     for i in range(1, 11):
         key = f"q{i}"

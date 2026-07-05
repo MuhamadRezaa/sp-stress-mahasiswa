@@ -77,18 +77,18 @@ const calendarDarkModeStyles = `
   }
 `;
 
-// PSS-10 Questions (Q7-Q10 are reverse scored on backend)
+// PSS-10 Questions
 const PSS_QUESTIONS = [
-  "Seberapa sering kamu merasa kesal karena hal yang terjadi tiba-tiba?",
-  "Seberapa sering kamu merasa tidak bisa mengendalikan hal-hal penting dalam hidupmu?",
-  "Seberapa sering kamu merasa gugup atau tertekan (stres)?",
-  "Seberapa sering kamu merasa kewalahan dengan semua hal yang harus kamu lakukan?",
-  "Seberapa sering kamu merasa marah karena ada hal-hal yang tidak bisa kamu kendalikan?",
-  "Seberapa sering kamu merasa masalah yang kamu hadapi terlalu banyak sampai sulit diatasi?",
-  "Seberapa sering kamu berhasil mengatasi masalah kecil yang mengganggu?",
-  "Seberapa sering kamu merasa mampu menghadapi perubahan yang terjadi hari ini?",
-  "Seberapa sering kamu merasa percaya diri saat menghadapi masalah pribadi?",
-  "Seberapa sering kamu merasa situasi yang kamu hadapi masih dalam kendalimu?",
+  "Hari ini, seberapa sering kamu merasa kesal karena hal yang terjadi tiba-tiba?",
+  "Hari ini, seberapa sering kamu merasa tidak bisa mengendalikan hal-hal penting dalam hidupmu?",
+  "Hari ini, seberapa sering kamu merasa gugup atau tertekan (stres)?",
+  "Hari ini, seberapa sering kamu merasa percaya diri saat menghadapi masalah pribadi?", // Pertanyaan positif
+  "Hari ini, seberapa sering kamu merasa segala sesuatu berjalan sesuai keinginanmu?", // Pertanyaan positif
+  "Hari ini, seberapa sering kamu merasa kewalahan dengan semua hal yang harus kamu lakukan?",
+  "Hari ini, seberapa sering kamu berhasil mengendalikan hal-hal yang membuatmu kesal?", // Pertanyaan positif
+  "Hari ini, seberapa sering kamu merasa situasi yang kamu hadapi masih dalam kendalimu?", // Pertanyaan positif
+  "Hari ini, seberapa sering kamu merasa marah karena ada hal-hal yang tidak bisa kamu kendalikan?",
+  "Hari ini, seberapa sering kamu merasa masalah yang kamu hadapi terlalu banyak sampai sulit diatasi?",
 ];
 
 const PSS_OPTIONS = [

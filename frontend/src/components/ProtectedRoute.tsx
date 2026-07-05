@@ -18,7 +18,8 @@ function isStudentProfileComplete(user: User): boolean {
     user.university &&
     user.major &&
     user.semester &&
-    user.residential_status
+    user.residential_status &&
+    user.wearable_device
   );
 }
 

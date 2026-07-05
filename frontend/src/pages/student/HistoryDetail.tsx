@@ -232,6 +232,9 @@ export default function HistoryDetail() {
                     </p>
                   )}
                 </div>
+                <div className="mt-4 p-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                  <strong>Informasi:</strong> Pertanyaan Q4, Q5, Q7, dan Q8 merupakan pertanyaan positif yang dihitung dengan bobot terbalik (reverse scoring) pada total skor.
+                </div>
               </div>
             ) : (
               <p className="text-sm text-gray-400 italic">Tidak ada data</p>

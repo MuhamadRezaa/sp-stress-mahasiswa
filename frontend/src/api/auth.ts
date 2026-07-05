@@ -13,6 +13,7 @@ export interface User {
   residential_status?: string;
   phone?: string;
   profile_picture?: string;
+  wearable_device?: string;
 }
 
 export interface LoginResponse {
@@ -22,7 +23,7 @@ export interface LoginResponse {
 export const login = async (email: string, password: string, remember: boolean = true): Promise<string> => {
   const response = await http.post<LoginResponse>("/auth/login", { email, password });
   const { access_token } = response.data;
-  
+
   if (remember) {
     localStorage.setItem("access_token", access_token);
     sessionStorage.removeItem("access_token");
@@ -30,7 +31,7 @@ export const login = async (email: string, password: string, remember: boolean =
     sessionStorage.setItem("access_token", access_token);
     localStorage.removeItem("access_token");
   }
-  
+
   return access_token;
 };
 

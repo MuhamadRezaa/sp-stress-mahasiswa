@@ -74,7 +74,7 @@ export default function UserProfiles() {
                 <div>
                   <h5 className="text-sm font-semibold text-warning-800 dark:text-warning-300 mb-1">Lengkapi Profil Anda Terlebih Dahulu</h5>
                   <p className="text-sm text-warning-700 dark:text-warning-400 leading-relaxed">
-                    Sebelum menggunakan fitur aplikasi, mohon lengkapi data pribadi Anda meliputi <strong>jenis kelamin, umur, universitas, jurusan, semester, dan status tempat tinggal</strong>. Data ini diperlukan untuk keakuratan penelitian.
+                    Sebelum menggunakan fitur aplikasi, mohon lengkapi data pribadi Anda meliputi <strong>jenis kelamin, umur, universitas, jurusan, semester, status tempat tinggal, dan perangkat wearable</strong>. Data ini diperlukan untuk keakuratan penelitian.
                   </p>
                 </div>
               </div>

@@ -19,6 +19,7 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
     age: 0,
     email: "",
     phone: "",
+    wearable_device: "",
   });
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
         age: user.age || 0,
         email: user.email || "",
         phone: user.phone || "",
+        wearable_device: user.wearable_device || "",
       });
     }
   }, [user]);
@@ -46,6 +48,7 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
         gender: formData.gender as "L" | "P",
         age: formData.age,
         phone: formattedPhone,
+        wearable_device: formData.wearable_device,
       });
       onUpdate();
       closeModal();
@@ -108,6 +111,15 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
                 {user?.phone || "-"}
               </p>
             </div>
+
+            <div>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                Perangkat Wearable (Smartwatch/Smartband)
+              </p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                {user?.wearable_device || "-"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -161,6 +173,16 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
                     />
                   </div>
 
+                  <div className="col-span-2">
+                    <Label>Alamat Email</Label>
+                    <Input
+                      type="text"
+                      value={formData.email}
+                      disabled
+                      className="bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Jenis Kelamin</Label>
                     <div className="flex items-center gap-4 mt-2">
@@ -194,22 +216,24 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
                     />
                   </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Alamat Email</Label>
-                    <Input
-                      type="text"
-                      value={formData.email}
-                      disabled
-                      className="bg-gray-50 cursor-not-allowed"
-                    />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
+                  <div className="col-span-2">
                     <Label>Nomor Telepon</Label>
                     <Input
                       type="text"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <Label>Perangkat Wearable (Smartwatch/Smartband)</Label>
+                    <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                      Contoh: Apple Watch Series 7, Samsung Galaxy Watch 5, Xiaomi Mi Band 6, Huawei Band 10
+                    </p>
+                    <Input
+                      type="text"
+                      value={formData.wearable_device}
+                      onChange={(e) => setFormData({ ...formData, wearable_device: e.target.value })}
                     />
                   </div>
                 </div>
