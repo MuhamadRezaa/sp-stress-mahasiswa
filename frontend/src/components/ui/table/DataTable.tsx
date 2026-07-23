@@ -119,6 +119,48 @@ export function DataTable<T>({
     setCurrentPage(page);
   };
 
+  // Helper to generate truncated page numbers with ellipsis (e.g. 1 ... 5 6 7 ... 29)
+  const getPageNumbers = () => {
+    const pageNumbers: (number | string)[] = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show page 1
+      pageNumbers.push(1);
+
+      // Determine range of pages around current page
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+
+      if (currentPage <= 3) {
+        end = 4;
+      } else if (currentPage >= totalPages - 2) {
+        start = totalPages - 3;
+      }
+
+      if (start > 2) {
+        pageNumbers.push("ellipsis-start");
+      }
+
+      for (let i = start; i <= end; i++) {
+        pageNumbers.push(i);
+      }
+
+      if (end < totalPages - 1) {
+        pageNumbers.push("ellipsis-end");
+      }
+
+      // Always show last page
+      pageNumbers.push(totalPages);
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="w-full">
       {/* Controls: Show Entries & Search */}
@@ -291,19 +333,33 @@ export function DataTable<T>({
                 </svg>
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`flex items-center justify-center w-10 h-10 text-sm font-medium transition-colors rounded-lg border ${
-                    currentPage === page
-                      ? "bg-brand-500 text-white border-brand-500 shadow-theme-xs"
-                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {getPageNumbers().map((page, idx) => {
+                if (page === "ellipsis-start" || page === "ellipsis-end") {
+                  return (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="flex items-center justify-center w-10 h-10 text-sm text-gray-400 dark:text-gray-600 select-none"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+
+                const pageNum = page as number;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`flex items-center justify-center w-10 h-10 text-sm font-medium transition-colors rounded-lg border ${
+                      currentPage === pageNum
+                        ? "bg-brand-500 text-white border-brand-500 shadow-theme-xs"
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
