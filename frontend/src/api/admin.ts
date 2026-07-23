@@ -11,7 +11,9 @@ export interface AdminUser extends User {
 export interface StressTrendItem {
   date: string;
   avg_score: number;
-  count: number;
+  low: number;
+  medium: number;
+  high: number;
 }
 
 export interface StressDistribution {

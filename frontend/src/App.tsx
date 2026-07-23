@@ -5,8 +5,9 @@ import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import StudentDashboard from "./pages/Dashboard/StudentDashboard";
-import PADashboard from "./pages/Dashboard/PADashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import PADashboard from "./pages/pa/PADashboard";
+import PAMahasiswa from "./pages/pa/PAMahasiswa";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminAssignPA from "./pages/admin/AdminAssignPA";
@@ -64,6 +65,11 @@ export default function App() {
             <Route path="/pa" element={
               <ProtectedRoute requiredRole="pa">
                 <PADashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/pa/students" element={
+              <ProtectedRoute requiredRole="pa">
+                <PAMahasiswa />
               </ProtectedRoute>
             } />
 

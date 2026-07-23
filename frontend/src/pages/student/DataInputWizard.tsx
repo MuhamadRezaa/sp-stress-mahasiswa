@@ -550,7 +550,7 @@ export default function DataInputWizard() {
                     <option value="Tidak ada">Tidak ada</option>
                     <option value="1–2">1–2</option>
                     <option value="3–4">3–4</option>
-                    <option value="≥4">&ge;4</option>
+                    <option value=">4">&gt;4</option>
                   </select>
                 </div>
               </div>

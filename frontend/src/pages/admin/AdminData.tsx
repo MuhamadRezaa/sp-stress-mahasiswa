@@ -5,13 +5,7 @@ import "react-day-picker/style.css";
 import PageMeta from "../../components/common/PageMeta";
 import { http } from "../../api/http";
 import { exportData } from "../../api/admin";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../components/ui/table";
+import { DataTable, Column } from "../../components/ui/table/DataTable";
 
 interface DataRow {
   student_id: number;
@@ -78,7 +72,6 @@ export default function AdminData() {
   const [range, setRange] = useState<DateRange | undefined>(undefined);
   const [tempRange, setTempRange] = useState<DateRange | undefined>(undefined);
   const [showModal, setShowModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const openModal = () => {
     setTempRange(range); // restore last applied range
@@ -119,20 +112,100 @@ export default function AdminData() {
   const handleReset = () => {
     setRange(undefined);
     setTempRange(undefined);
-    setSearchQuery("");
     fetchData(undefined);
   };
 
-  const filteredRows = rows.filter(
-    (r) =>
-      r.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.student_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.activity_date.includes(searchQuery) ||
-      (r.pa_name || "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const goToDetail = (row: DataRow) => {
     navigate(`/admin/data/${row.student_id}/${row.activity_date}`, { state: { row } });
+  };
+
+  // Define Columns for DataTable
+  const columns: Column<DataRow>[] = [
+    {
+      header: "Tanggal",
+      accessor: "activity_date",
+      sortable: true,
+    },
+    {
+      header: "Jenis Hari",
+      accessor: "day_type",
+      sortable: true,
+      render: (row) => {
+        if (row.day_type === "ujian") {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+              Ujian
+            </span>
+          );
+        } else if (row.day_type === "perkuliahan") {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              Kuliah
+            </span>
+          );
+        }
+        return <span className="text-gray-400">-</span>;
+      },
+    },
+    {
+      header: "Mahasiswa",
+      accessor: "student_name",
+      sortable: true,
+      render: (row) => (
+        <div className="text-start">
+          <p className="font-semibold text-gray-800 dark:text-white text-sm">{row.student_name}</p>
+          <p className="text-xs text-gray-400">{row.student_email}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Prodi / Sem",
+      accessor: "major",
+      sortable: true,
+      render: (row) => (
+        <span>
+          {row.major || "-"}{row.semester ? ` · Sem ${row.semester}` : ""}
+        </span>
+      ),
+    },
+    {
+      header: "Dosen PA",
+      accessor: "pa_name",
+      sortable: true,
+      render: (row) => <span>{row.pa_name || "-"}</span>,
+    },
+    {
+      header: "Level Stress",
+      accessor: "pss10_stress_level",
+      sortable: true,
+      render: (row) => stressBadge(row.pss10_stress_level),
+    },
+    {
+      header: "Aksi",
+      accessor: "activity_date",
+      align: "center" as const,
+      render: (row) => (
+        <button
+          onClick={() => goToDetail(row)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-500 bg-brand-50 hover:bg-brand-100 rounded-lg dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors"
+        >
+          Detail
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      ),
+    },
+  ];
+
+  // Global search filtering helper
+  const globalFilter = (row: DataRow, query: string) => {
+    const name = row.student_name.toLowerCase();
+    const email = row.student_email.toLowerCase();
+    const date = row.activity_date.toLowerCase();
+    const pa = (row.pa_name || "").toLowerCase();
+    const major = (row.major || "").toLowerCase();
+    return name.includes(query) || email.includes(query) || date.includes(query) || pa.includes(query) || major.includes(query);
   };
 
   return (
@@ -148,7 +221,6 @@ export default function AdminData() {
         {/* Filter Bar */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex flex-wrap gap-4 items-end">
-
             {/* Range Date Picker trigger button */}
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
@@ -172,29 +244,17 @@ export default function AdminData() {
               </button>
             </div>
 
-            {/* Search */}
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Cari</label>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Nama, email, PA, tanggal..."
-                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 w-52"
-              />
-            </div>
-
             <button
               onClick={() => fetchData()}
               className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-xl transition-colors"
             >
-              Terapkan
+              Terapkan Tanggal
             </button>
             <button
               onClick={handleReset}
               className="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
             >
-              Reset
+              Reset Tanggal
             </button>
 
             <div className="ml-auto">
@@ -213,95 +273,22 @@ export default function AdminData() {
               </button>
             </div>
           </div>
-
-          {!isLoading && (
-            <p className="text-xs text-gray-400 mt-3">
-              Menampilkan{" "}
-              <span className="font-semibold text-gray-600 dark:text-gray-200">{filteredRows.length}</span>{" "}
-              dari {rows.length} baris data
-              {range?.from && range?.to && (
-                <span className="ml-1 text-brand-500">
-                  ({toIso(range.from)} → {toIso(range.to)})
-                </span>
-              )}
-            </p>
-          )}
         </div>
 
         {/* Tabel */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
           {isLoading ? (
             <div className="flex justify-center items-center h-60">
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-brand-500"></div>
             </div>
-          ) : filteredRows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-60 text-gray-400">
-              <p className="text-3xl mb-2">📭</p>
-              <p>Tidak ada data yang sesuai filter.</p>
-            </div>
           ) : (
-            <div className="max-w-full overflow-x-auto">
-              <Table>
-                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                  <TableRow>
-                    {["Tanggal", "Jenis Hari", "Mahasiswa", "Prodi / Sem", "Dosen PA", "Level Stress", "Aksi"].map((h) => (
-                      <TableCell
-                        key={h}
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 whitespace-nowrap"
-                      >
-                        {h}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {filteredRows.map((row, idx) => (
-                    <TableRow key={idx} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                      <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400 font-mono whitespace-nowrap">
-                        {row.activity_date}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                        {row.day_type === "ujian" ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                            Ujian
-                          </span>
-                        ) : row.day_type === "perkuliahan" ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                            Kuliah
-                          </span>
-                        ) : "-"}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-start">
-                        <p className="font-medium text-gray-800 dark:text-white text-sm">{row.student_name}</p>
-                        <p className="text-xs text-gray-400">{row.student_email}</p>
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                        {row.major || "-"}{row.semester ? ` · Sem ${row.semester}` : ""}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                        {row.pa_name || "-"}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-start">
-                        {stressBadge(row.pss10_stress_level)}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-start">
-                        <button
-                          onClick={() => goToDetail(row)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-500 bg-brand-50 hover:bg-brand-100 rounded-lg dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors"
-                        >
-                          Detail
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <DataTable
+              columns={columns}
+              data={rows}
+              globalFilterFn={globalFilter}
+              searchPlaceholder="Cari nama, email, PA, prodi..."
+              defaultRowsPerPage={10}
+            />
           )}
         </div>
       </div>
@@ -349,10 +336,15 @@ export default function AdminData() {
               </p>
               <div className="flex gap-2 flex-shrink-0">
                 <button
-                  onClick={() => { setTempRange(undefined); }}
+                  onClick={() => {
+                    setTempRange(undefined);
+                    setRange(undefined);
+                    setShowModal(false);
+                    fetchData(undefined);
+                  }}
                   className="px-4 py-2 text-sm text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-xl transition-colors"
                 >
-                  Hapus
+                  Hapus Pilihan
                 </button>
                 <button
                   onClick={cancelModal}

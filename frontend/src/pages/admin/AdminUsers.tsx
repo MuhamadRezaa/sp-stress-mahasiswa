@@ -230,7 +230,6 @@ export default function AdminUsers() {
         onClose={() => { setShowCreateModal(false); setEditUser(null); resetForm(); }}
         className="max-w-md p-6"
         showCloseButton={false}
-        showBlur={false}
       >
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
           {editUser ? "Edit User" : "Tambah User Baru"}

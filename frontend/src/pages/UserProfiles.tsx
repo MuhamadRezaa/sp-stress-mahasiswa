@@ -15,6 +15,18 @@ export default function UserProfiles() {
   const location = useLocation();
   const requiresProfileCompletion = (location.state as { requiresProfileCompletion?: boolean })?.requiresProfileCompletion ?? false;
 
+  const isProfileIncomplete = user ? (
+    user.role === "student" && (
+      !user.gender ||
+      !user.age ||
+      !user.university ||
+      !user.major ||
+      !user.semester ||
+      !user.residential_status ||
+      !user.wearable_device
+    )
+  ) : false;
+
   const fetchUser = async () => {
     try {
       setLoading(true);
@@ -58,12 +70,12 @@ export default function UserProfiles() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
         <div className="space-y-6">
           {alertMessage && (
-            <div className="animate-fade-in">
+            <div className="fixed bottom-5 left-1/2 -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[999999] max-w-md w-[calc(100%-2rem)] md:w-[350px] animate-fade-in shadow-lg">
               <Alert variant="success" title="Sukses!" message={alertMessage} />
             </div>
           )}
 
-          {requiresProfileCompletion && (
+          {requiresProfileCompletion && isProfileIncomplete && (
             <div className="p-4 rounded-2xl bg-warning-50 border border-warning-200 dark:bg-warning-500/10 dark:border-warning-500/20 animate-fade-in">
               <div className="flex gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warning-100 dark:bg-warning-500/20 flex items-center justify-center text-warning-600 dark:text-warning-400">

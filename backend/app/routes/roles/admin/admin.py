@@ -151,7 +151,7 @@ def assign_pa():
 @roles_required("admin")
 def stress_trend():
     """
-    Rata-rata skor PSS-10 per hari untuk 30 hari terakhir.
+    Rata-rata skor PSS-10 dan hitungan tingkat stress per hari untuk 30 hari terakhir.
     """
     from sqlalchemy import func
     thirty_days_ago = date.today() - timedelta(days=30)
@@ -160,7 +160,9 @@ def stress_trend():
         db.session.query(
             PSS10Response.activity_date,
             func.avg(PSS10Response.total_score).label("avg_score"),
-            func.count(PSS10Response.id).label("count"),
+            func.sum(db.case((PSS10Response.stress_level == "low", 1), else_=0)).label("low_count"),
+            func.sum(db.case((PSS10Response.stress_level == "medium", 1), else_=0)).label("medium_count"),
+            func.sum(db.case((PSS10Response.stress_level == "high", 1), else_=0)).label("high_count"),
         )
         .filter(PSS10Response.activity_date >= thirty_days_ago)
         .group_by(PSS10Response.activity_date)
@@ -173,8 +175,10 @@ def stress_trend():
         "data": [
             {
                 "date": r.activity_date.isoformat(),
-                "avg_score": round(float(r.avg_score), 2),
-                "count": r.count,
+                "avg_score": round(float(r.avg_score), 2) if r.avg_score else 0,
+                "low": int(r.low_count or 0),
+                "medium": int(r.medium_count or 0),
+                "high": int(r.high_count or 0),
             }
             for r in rows
         ]
@@ -185,22 +189,28 @@ def stress_trend():
 @roles_required("admin")
 def stress_distribution():
     """
-    Distribusi low/medium/high berdasarkan skor PSS-10 terakhir setiap mahasiswa.
+    Distribusi low/medium/high berdasarkan seluruh data respon PSS-10.
     """
-    students = User.query.filter_by(role="student").all()
-    counts = {"low": 0, "medium": 0, "high": 0, "no_data": 0}
-
-    for s in students:
-        last = (
-            PSS10Response.query
-            .filter_by(user_id=s.id)
-            .order_by(PSS10Response.activity_date.desc())
-            .first()
+    from sqlalchemy import func
+    rows = (
+        db.session.query(
+            PSS10Response.stress_level,
+            func.count(PSS10Response.id).label("count")
         )
-        if last:
-            counts[last.stress_level] += 1
-        else:
-            counts["no_data"] += 1
+        .group_by(PSS10Response.stress_level)
+        .all()
+    )
+
+    counts = {"low": 0, "medium": 0, "high": 0, "no_data": 0}
+    for r in rows:
+        if r.stress_level in counts:
+            counts[r.stress_level] = r.count
+
+    students = User.query.filter_by(role="student").all()
+    has_data_users = db.session.query(PSS10Response.user_id).distinct().all()
+    has_data_user_ids = {u[0] for u in has_data_users}
+    no_data_count = sum(1 for s in students if s.id not in has_data_user_ids)
+    counts["no_data"] = no_data_count
 
     total_students = len(students)
     return jsonify({

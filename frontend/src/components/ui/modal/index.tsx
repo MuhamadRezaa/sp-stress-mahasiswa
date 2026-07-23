@@ -7,7 +7,6 @@ interface ModalProps {
   children: React.ReactNode;
   showCloseButton?: boolean; // New prop to control close button visibility
   isFullscreen?: boolean; // Default to false for backwards compatibility
-  showBlur?: boolean; // New prop to toggle backdrop blur
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -17,7 +16,6 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   showCloseButton = true, // Default to true for backwards compatibility
   isFullscreen = false,
-  showBlur = true,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +57,7 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-[100000]">
       {!isFullscreen && (
         <div
-          className={`fixed inset-0 h-full w-full bg-gray-400/50 ${showBlur ? "backdrop-blur-[32px]" : ""}`}
+          className="fixed inset-0 h-full w-full bg-gray-500/10 dark:bg-black/20 backdrop-blur-md"
           onClick={onClose}
         ></div>
       )}

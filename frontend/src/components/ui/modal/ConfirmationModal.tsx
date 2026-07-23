@@ -41,7 +41,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showBlur={false} className="max-w-[400px] p-6">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[400px] p-6">
       <div className="flex flex-col items-center text-center">
         {/* Icon Area */}
         <div className={`flex h-14 w-14 items-center justify-center rounded-full mb-4 ${getVariantColor()}`}>

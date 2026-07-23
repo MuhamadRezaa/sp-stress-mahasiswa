@@ -49,7 +49,7 @@ const paNavItems: NavItem[] = [
   {
     icon: <GroupIcon />,
     name: "Mahasiswa Bimbingan",
-    path: "/pa",
+    path: "/pa/students",
   },
 ];
 
